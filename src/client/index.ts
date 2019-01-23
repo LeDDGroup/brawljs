@@ -48,27 +48,29 @@ class Controller {
     this.socket.emit("newPlayer", {});
 
     setInterval(() => {
-      const update = {
-        messageId: Date.now().toString(),
-        speed: {
-          x: fixedSpeed(
-            this.input.keyboardStatus["a"],
-            this.input.keyboardStatus["d"]
-          ),
-          y: fixedSpeed(
-            this.input.keyboardStatus["w"],
-            this.input.keyboardStatus["s"]
-          )
-        }
-      };
-      this.socket.emit("update", update);
-      this.messages.push(update);
-
-      // draw
-      this.game.updatePlayer(this.id, update);
-      this.game.update();
+      this.update();
       this.draw();
     }, 1000 / 60);
+  }
+  update() {
+    const update = {
+      messageId: Date.now().toString(),
+      speed: {
+        x: fixedSpeed(
+          this.input.keyboardStatus["a"],
+          this.input.keyboardStatus["d"]
+        ),
+        y: fixedSpeed(
+          this.input.keyboardStatus["w"],
+          this.input.keyboardStatus["s"]
+        )
+      }
+    };
+    this.socket.emit("update", update);
+    this.messages.push(update);
+    this.game.updatePlayer(this.id, update);
+
+    this.game.update();
   }
   draw() {
     document.getElementById("messages").innerText = `Non-acknowledged input: ${
