@@ -1,7 +1,7 @@
 {
-  "name": "template-node-javascript-game",
+  "name": "game-typescript",
   "version": "1.0.0",
-  "description": "Example of multiplayer game on node",
+  "description": "Multiplayer game on node",
   "main": "dist/server/index.js",
   "scripts": {
     "start": "node dist/server/index.js",

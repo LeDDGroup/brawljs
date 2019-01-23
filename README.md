@@ -1,4 +1,4 @@
-# template-node-javascript-game
+# Game Typescript
 
 Example of multiplayer game on node
 
