@@ -1,6 +1,6 @@
 import { createElement } from "tsx-create-html-element";
 import { removeChildren } from "./remove-children";
-import { callbackPromise } from "./callback-promise";
+import { callbackPromise } from "@leddgroup/callback-promise";
 
 export async function login(): Promise<{ name: string; color: string }> {
   const container = document.getElementById("app");
