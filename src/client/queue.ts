@@ -6,6 +6,7 @@ interface Node<T> {
 export class Queue<T> {
   private top: Node<T> | null = null;
   private last: Node<T> | null = null;
+  public length = 0;
   get front(): T {
     if (this.top === null) {
       throw new Error("Queue is empty");
@@ -19,6 +20,7 @@ export class Queue<T> {
     if (this.top === null) {
       throw new Error("Queue is empty");
     }
+    this.length--;
     if (this.top.next === null) {
       this.top = this.last = null;
     } else {
@@ -26,6 +28,7 @@ export class Queue<T> {
     }
   }
   push(value: T) {
+    this.length++;
     const node = { value, next: null };
     if (this.top === null) {
       this.top = this.last = node;

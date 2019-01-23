@@ -10,17 +10,8 @@ import { Input } from "./input";
 import { Game } from "./game";
 import { Queue } from "./queue";
 
-class Counter {
-  counter = 0;
-  next() {
-    this.counter++;
-    return this.counter.toString();
-  }
-}
-
 class Controller {
   input = new Input();
-  counter = new Counter();
   game = new Game();
   messages = new Queue<ClientMessages["update"]>();
   constructor(
@@ -39,7 +30,7 @@ class Controller {
           if (lastMessage !== "")
             while (
               !this.messages.empty() &&
-              this.messages.front.messageId !== lastMessage
+              lastMessage >= this.messages.front.messageId
             ) {
               this.messages.drop();
             }
@@ -58,7 +49,7 @@ class Controller {
 
     setInterval(() => {
       const update = {
-        messageId: this.counter.next(),
+        messageId: Date.now().toString(),
         speed: {
           x: fixedSpeed(
             this.input.keyboardStatus["a"],
@@ -80,6 +71,9 @@ class Controller {
     }, 1000 / 60);
   }
   draw() {
+    document.getElementById("messages").innerText = `Non-acknowledged input: ${
+      this.messages.length
+    }`;
     this.context.clearRect(0, 0, 800, 600);
     this.context.fillStyle = "green";
     for (const id in this.game.players) {
@@ -121,6 +115,7 @@ run();
 declare global {
   interface Document {
     getElementById(selector: "game"): HTMLCanvasElement;
+    getElementById(selector: "messages"): HTMLParagraphElement;
   }
 }
 
