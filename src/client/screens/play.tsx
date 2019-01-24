@@ -2,6 +2,7 @@ import io from "socket.io-client";
 import { Controller } from "../controller";
 import { removeChildren } from "./remove-children";
 import { createElement } from "tsx-create-html-element";
+import defer from "p-defer";
 
 export async function play(info: { name: string; color: string }) {
   const container = document.getElementById("app");
@@ -19,10 +20,11 @@ export async function play(info: { name: string; color: string }) {
   }
 
   const socket = io({ autoConnect: false });
-  socket.on("connect", () => {
-    const controller = new Controller(context, socket, info);
-    controller.setup();
-    controller.start();
-  });
+  const onConnect = defer();
+  socket.on("connect", onConnect.resolve);
   socket.connect();
+  await onConnect.promise;
+  const controller = new Controller(context, socket, info);
+  controller.setup();
+  controller.start();
 }
