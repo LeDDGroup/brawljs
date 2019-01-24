@@ -1,7 +1,7 @@
 {
-  "name": "game-typescript",
+  "name": "brawljs",
   "version": "1.0.0",
-  "description": "Multiplayer game on node",
+  "description": "Fast paced multiplayer game in javascript",
   "main": "dist/server/index.js",
   "scripts": {
     "start": "node dist/server/index.js",

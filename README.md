@@ -1,6 +1,6 @@
-# Game Typescript
+# brawljs
 
-Example of multiplayer game on node
+Fast paced multiplayer game in javascript
 
 ## Requisites
 
