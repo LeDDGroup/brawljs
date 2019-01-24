@@ -73,6 +73,7 @@ export async function createWebpackMiddleware() {
 
   return await koaWebpack({
     devMiddleware: {
+      clientLogLevel: "none",
       publicPath: "/"
     },
     config: webpackConfig

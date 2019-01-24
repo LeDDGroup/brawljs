@@ -20,7 +20,6 @@ export class Controller {
   async setup() {
     this.input.setupKeyboardEvents();
 
-    // drawing
     this.socket.on("sync", data => {
       this.game.sync(data);
       if (data.players[this.id]) {
