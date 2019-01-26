@@ -1,4 +1,4 @@
-import { Input } from "./input";
+import { Player } from "./player";
 import { Game } from "./game";
 import { Queue } from "./queue";
 import {
@@ -11,14 +11,16 @@ import {
 export class Controller {
   game = new Game();
   messages = new Queue<ClientMessages["update"]>();
+  player = new Player({
+    keybindings: { left: "a", right: "d", up: "w", down: "s" }
+  });
   constructor(
     public context: CanvasRenderingContext2D,
     public socket: ExtendedSocket,
-    public info: { name: string; color: string },
-    public input: Input = new Input()
+    public info: { name: string; color: string }
   ) {}
   async setup() {
-    this.input.setupKeyboardEvents();
+    this.player.setup();
 
     this.socket.on("sync", data => {
       this.game.sync(data);
@@ -33,7 +35,7 @@ export class Controller {
               this.messages.drop();
             }
           this.messages.forEach(message => {
-            this.game.updatePlayer(this.id, message);
+            this.game.syncPlayer(this.id, message);
             this.game.update();
             return true;
           });
@@ -54,24 +56,19 @@ export class Controller {
     }, 1000 / 60);
   }
   update() {
-    const update = {
+    const speed = this.player.moving();
+    const update: ClientMessages["update"] = {
       messageId: Date.now().toString(),
-      speed: {
-        x: fixedSpeed(
-          this.input.keyboardStatus["a"],
-          this.input.keyboardStatus["d"]
-        ),
-        y: fixedSpeed(
-          this.input.keyboardStatus["w"],
-          this.input.keyboardStatus["s"]
-        )
-      }
+      speed,
+      shoot: this.player.shooting,
+      shootDirection: speed
     };
     this.socket.emit("update", update);
     this.messages.push(update);
-    this.game.updatePlayer(this.id, update);
+    this.game.syncPlayer(this.id, update);
 
     this.game.update();
+    this.player.resetInput();
   }
   draw() {
     this.context.clearRect(0, 0, 800, 600);
@@ -98,6 +95,15 @@ export class Controller {
       );
       this.context.restore();
     }
+    for (const shot of this.game.shots) {
+      this.context.save();
+      this.context.fillStyle = "blue";
+      this.context.beginPath();
+      this.context.arc(shot.position.x, shot.position.y, 5, 0, 2 * Math.PI);
+      this.context.closePath();
+      this.context.fill();
+      this.context.restore();
+    }
   }
   get id() {
     return this.socket.id;
@@ -107,8 +113,4 @@ export class Controller {
 interface ExtendedSocket extends SocketIOClient.Socket {
   on: MessageHandlerDispatcher<ServerMessages>;
   emit: MessageDispatcher<ClientMessages>;
-}
-
-function fixedSpeed(left: boolean, right: boolean) {
-  return (right ? 1 : 0) - (left ? 1 : 0);
 }

@@ -1,4 +1,4 @@
-import { GameBase, Player } from "../core/game-base";
+import { GameBase, Player, Shot } from "../core/game-base";
 import { ServerMessages } from "../core/messages";
 
 export class Game extends GameBase {
@@ -13,5 +13,6 @@ export class Game extends GameBase {
       player.color = newData.color;
       player.name = newData.name;
     }
+    this.shots = data.shots.map(shot => new Shot(shot.position, shot.speed));
   }
 }

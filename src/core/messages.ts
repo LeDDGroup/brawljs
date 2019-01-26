@@ -9,12 +9,23 @@ export interface IPlayer {
 
 export interface ClientMessages {
   newPlayer: { name: string; color: string };
-  update: { messageId: string; speed: IPoint };
+  update: {
+    messageId: string;
+    speed: IPoint;
+    shoot: boolean;
+    shootDirection: IPoint;
+  };
+}
+
+export interface IShot {
+  position: IPoint;
+  speed: IPoint;
 }
 
 export interface ServerMessages {
   sync: {
     players: Record<any, IPlayer>;
+    shots: IShot[];
     size: IPoint;
   };
 }

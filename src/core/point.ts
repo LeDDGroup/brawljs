@@ -6,7 +6,7 @@ export interface IPoint {
 export class Point implements IPoint {
   public x: number;
   public y: number;
-  constructor(options: { x?: number; y?: number } = {}) {
+  constructor(options: Partial<IPoint> = {}) {
     const { x = 0, y = 0 } = options;
     this.x = x;
     this.y = y;

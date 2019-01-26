@@ -13,6 +13,6 @@ export class Game extends GameBase {
     delete this.players[id];
   }
   getState(): ServerMessages["sync"] {
-    return { players: this.players, size: this.size };
+    return { players: this.players, shots: this.shots, size: this.size };
   }
 }

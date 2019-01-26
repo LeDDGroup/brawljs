@@ -50,7 +50,7 @@ class Server {
     });
     socket.on("update", async data => {
       if (this.game.players[socket.id]) {
-        this.game.updatePlayer(socket.id, data);
+        this.game.syncPlayer(socket.id, data);
       }
     });
   };
