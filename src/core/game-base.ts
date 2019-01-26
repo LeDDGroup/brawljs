@@ -3,6 +3,8 @@ import { ClientMessages } from "./messages";
 
 export class Player {
   lastMessage = "";
+  name: string = "";
+  color: string = "";
   position: Point = new Point();
   speed: Point = new Point();
   constructor(public id: string) {}

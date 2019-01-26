@@ -45,8 +45,8 @@ class Server {
     socket.on("disconnect", () => {
       this.game.removePlayer(socket.id);
     });
-    socket.on("newPlayer", () => {
-      this.game.addPlayer(socket.id);
+    socket.on("newPlayer", data => {
+      this.game.addPlayer(socket.id, data);
     });
     socket.on("update", async data => {
       if (this.game.players[socket.id]) {

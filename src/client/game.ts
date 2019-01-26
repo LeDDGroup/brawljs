@@ -6,11 +6,12 @@ export class Game extends GameBase {
     for (const id in data.players) {
       const newData = data.players[id];
       if (!this.players[id]) {
-        const player = new Player(id);
-        this.players[id] = player;
+        this.players[id] = new Player(id);
       }
-      this.players[id].position.assign(newData.position);
-      // this.players[id].speed.assign(data.players[id].speed);
+      const player = this.players[id];
+      player.position.assign(newData.position);
+      player.color = newData.color;
+      player.name = newData.name;
     }
   }
 }

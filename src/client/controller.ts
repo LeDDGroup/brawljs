@@ -43,7 +43,10 @@ export class Controller {
   }
   start() {
     // game
-    this.socket.emit("newPlayer", {});
+    this.socket.emit("newPlayer", {
+      name: this.info.name,
+      color: this.info.color
+    });
 
     setInterval(() => {
       this.update();
@@ -74,11 +77,8 @@ export class Controller {
     this.context.clearRect(0, 0, 800, 600);
     for (const id in this.game.players) {
       const player = this.game.players[id];
-      if (id === this.id) {
-        this.context.fillStyle = this.info.color;
-      } else {
-        this.context.fillStyle = "red";
-      }
+      this.context.save();
+      this.context.fillStyle = player.color;
       this.context.beginPath();
       this.context.arc(
         player.position.x,
@@ -87,7 +87,16 @@ export class Controller {
         0,
         2 * Math.PI
       );
+      this.context.closePath();
       this.context.fill();
+      this.context.fillStyle = "red";
+      this.context.textAlign = "center";
+      this.context.fillText(
+        player.name,
+        player.position.x,
+        player.position.y - 10
+      );
+      this.context.restore();
     }
   }
   get id() {

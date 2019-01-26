@@ -2,11 +2,13 @@ import { IPoint } from "./point";
 
 export interface IPlayer {
   lastMessage: string;
+  name: string;
+  color: string;
   position: IPoint;
 }
 
 export interface ClientMessages {
-  newPlayer: {};
+  newPlayer: { name: string; color: string };
   update: { messageId: string; speed: IPoint };
 }
 
