@@ -1,6 +1,6 @@
-import { Player } from "./player";
+import { Player } from "./utils/player";
 import { Game } from "./game";
-import { Queue } from "./queue";
+import { Queue } from "./utils/queue";
 import {
   MessageHandlerDispatcher,
   MessageDispatcher,
