@@ -19,6 +19,10 @@ export class Player {
         bto1(this.keyboardStatus[this.keybindings.up])
     };
   }
+  pointing(): IPoint {
+    // TODO use canvas and player position
+    return this.moving();
+  }
   setup() {
     document.addEventListener("keydown", ev => {
       if (ev.key === " ") {

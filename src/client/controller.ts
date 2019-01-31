@@ -56,12 +56,11 @@ export class Controller {
     }, 1000 / 60);
   }
   update() {
-    const speed = this.player.moving();
     const update: ClientMessages["update"] = {
       messageId: Date.now().toString(),
-      speed,
+      speed: this.player.moving(),
       shoot: this.player.shooting,
-      shootDirection: speed
+      shootDirection: this.player.pointing()
     };
     this.socket.emit("update", update);
     this.messages.push(update);
