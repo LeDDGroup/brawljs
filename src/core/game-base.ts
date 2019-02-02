@@ -2,6 +2,7 @@ import { Point, IPoint } from "./point";
 import { ClientMessages } from "./messages";
 
 const SHOOT_COOLDOWN = 60;
+const SPEED = 1;
 
 export class Player {
   lastMessage = "";
@@ -12,7 +13,7 @@ export class Player {
   shootCooldown: number = 0;
   constructor(public id: string) {}
   sync(status: { speed: IPoint }) {
-    this.speed.assign(status.speed);
+    this.speed.assign(status.speed).top(SPEED);
   }
   update() {
     if (this.shootCooldown > 0) {

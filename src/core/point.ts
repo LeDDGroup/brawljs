@@ -65,9 +65,11 @@ export class Point implements IPoint {
     return this;
   }
   public top(length: number): Point {
-    const angle = Math.atan2(this.y, this.x);
-    this.x = Math.cos(angle) * length;
-    this.y = Math.sin(angle) * length;
+    if (this.x !== 0 || this.y !== 0) {
+      const angle = Math.atan2(this.y, this.x);
+      this.x = Math.cos(angle) * length;
+      this.y = Math.sin(angle) * length;
+    }
     return this;
   }
 }
