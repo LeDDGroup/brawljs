@@ -59,15 +59,20 @@ export class Controller {
   }
   update() {
     const player = this.game.players[this.id];
-    const update: ClientMessages["update"] = {
+    const baseUpdate: ClientMessages["update"] = {
       messageId: Date.now().toString(),
       speed: this.playerInput.moving(),
+      shoot: false,
+      shootDirection: { x: 0, y: 0 }
+    };
+    const update = {
+      ...baseUpdate,
       shoot: this.playerInput.shooting,
       shootDirection: this.playerInput.pointing.copy().subtract(player.position)
     };
     this.socket.emit("update", update);
-    this.messages.push(update);
-    this.game.syncPlayer(this.id, update);
+    this.messages.push(baseUpdate);
+    this.game.syncPlayer(this.id, baseUpdate);
 
     this.game.update();
     this.playerInput.resetInput();

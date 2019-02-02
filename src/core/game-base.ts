@@ -1,17 +1,23 @@
 import { Point, IPoint } from "./point";
 import { ClientMessages } from "./messages";
 
+const SHOOT_COOLDOWN = 60;
+
 export class Player {
   lastMessage = "";
   name: string = "";
   color: string = "";
   position: Point = new Point();
   speed: Point = new Point();
+  shootCooldown: number = 0;
   constructor(public id: string) {}
   sync(status: { speed: IPoint }) {
     this.speed.assign(status.speed);
   }
   update() {
+    if (this.shootCooldown > 0) {
+      this.shootCooldown--;
+    }
     this.position.sum(this.speed);
   }
 }
@@ -50,7 +56,8 @@ export class GameBase {
     const player = this.players[id];
     player.lastMessage = data.messageId;
     player.sync(data);
-    if (data.shoot) {
+    if (data.shoot && player.shootCooldown <= 0) {
+      player.shootCooldown = SHOOT_COOLDOWN;
       const speed = new Point(data.shootDirection).top(3);
       this.shots.push(new Shot(player.position, speed));
     }
