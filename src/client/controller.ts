@@ -11,16 +11,18 @@ import {
 export class Controller {
   game = new Game();
   messages = new Queue<ClientMessages["update"]>();
-  player = new Player({
-    keybindings: { left: "a", right: "d", up: "w", down: "s" }
+  playerInput = new Player({
+    keybindings: { left: "a", right: "d", up: "w", down: "s" },
+    canvas: this.canvas
   });
   constructor(
     public context: CanvasRenderingContext2D,
     public socket: ExtendedSocket,
-    public info: { name: string; color: string }
+    public info: { name: string; color: string },
+    public canvas: HTMLCanvasElement
   ) {}
   async setup() {
-    this.player.setup();
+    this.playerInput.setup();
 
     this.socket.on("sync", data => {
       this.game.sync(data);
@@ -56,18 +58,19 @@ export class Controller {
     }, 1000 / 60);
   }
   update() {
+    const player = this.game.players[this.id];
     const update: ClientMessages["update"] = {
       messageId: Date.now().toString(),
-      speed: this.player.moving(),
-      shoot: this.player.shooting,
-      shootDirection: this.player.pointing()
+      speed: this.playerInput.moving(),
+      shoot: this.playerInput.shooting,
+      shootDirection: this.playerInput.pointing.copy().subtract(player.position)
     };
     this.socket.emit("update", update);
     this.messages.push(update);
     this.game.syncPlayer(this.id, update);
 
     this.game.update();
-    this.player.resetInput();
+    this.playerInput.resetInput();
   }
   draw() {
     this.context.clearRect(0, 0, 800, 600);

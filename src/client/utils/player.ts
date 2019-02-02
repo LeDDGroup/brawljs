@@ -1,4 +1,4 @@
-import { IPoint } from "../../core/point";
+import { IPoint, Point } from "../../core/point";
 
 type Direction = "right" | "down" | "left" | "up";
 
@@ -6,8 +6,14 @@ export class Player {
   public keyboardStatus: { [id: string]: boolean } = {};
   public shooting = false;
   public keybindings: Record<Direction, string>;
-  constructor(options: { keybindings: Record<Direction, string> }) {
+  public canvas: HTMLCanvasElement;
+  public pointing = new Point();
+  constructor(options: {
+    keybindings: Record<Direction, string>;
+    canvas: HTMLCanvasElement;
+  }) {
     this.keybindings = options.keybindings;
+    this.canvas = options.canvas;
   }
   moving(): IPoint {
     return {
@@ -18,10 +24,6 @@ export class Player {
         bto1(this.keyboardStatus[this.keybindings.down]) -
         bto1(this.keyboardStatus[this.keybindings.up])
     };
-  }
-  pointing(): IPoint {
-    // TODO use canvas and player position
-    return this.moving();
   }
   setup() {
     document.addEventListener("keydown", ev => {
@@ -36,7 +38,8 @@ export class Player {
       }
       this.keyboardStatus[ev.key] = false;
     });
-    document.addEventListener("click", () => {
+    this.canvas.addEventListener("click", ev => {
+      this.pointing.assign({ x: ev.clientX, y: ev.clientY });
       this.shooting = true;
     });
   }

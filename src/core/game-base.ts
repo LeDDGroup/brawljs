@@ -51,9 +51,8 @@ export class GameBase {
     player.lastMessage = data.messageId;
     player.sync(data);
     if (data.shoot) {
-      this.shots.push(
-        new Shot(player.position, new Point(data.shootDirection).multiply(3))
-      );
+      const speed = new Point(data.shootDirection).top(3);
+      this.shots.push(new Shot(player.position, speed));
     }
   }
 }

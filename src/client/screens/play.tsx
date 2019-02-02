@@ -24,7 +24,7 @@ export async function play(info: { name: string; color: string }) {
   socket.on("connect", onConnect.resolve);
   socket.connect();
   await onConnect.promise;
-  const controller = new Controller(context, socket, info);
+  const controller = new Controller(context, socket, info, canvasRef.value);
   controller.setup();
   controller.start();
 }
