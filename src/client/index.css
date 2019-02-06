@@ -1,3 +1,49 @@
+body {
+  background-color: #7cbc8c;
+  margin: 0px;
+  padding: 0px;
+  min-height: 100vh;
+  text-align: center;
+
+}
 canvas {
+  background-color: white;
   border: 1px solid;
+  width: 98vw;
+  height: 98vw;
+  max-width: 98vh;
+  max-height: 98vh;
+  margin: 0;
+  border: 0;
+}
+
+.container {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -30%);
+}
+
+.container > form {
+  display: flex;
+  width: 100%;
+}
+
+#color-picker {
+  width: 30px;
+}
+
+.container > form > input {
+  margin: 0;
+  border: 0;
+}
+
+input,
+button {
+  padding: 0px;
+}
+
+.container > div {
+  text-align: center;
+  padding-top: 15px;
 }

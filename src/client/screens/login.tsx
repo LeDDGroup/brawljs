@@ -2,17 +2,35 @@ import { createElement } from "tsx-create-html-element";
 import { removeChildren } from "./remove-children";
 import defer from "p-defer";
 
+const MAX_COLOR = 255 * 255 * 255;
+
 export async function login(): Promise<{ name: string; color: string }> {
   const container = document.getElementById("app");
   removeChildren(container);
   const onClick = defer();
   const nameRef: JSX.Reference<"input"> = {};
   const colorRef: JSX.Reference<"input"> = {};
+  const randomColor = Math.floor(MAX_COLOR * Math.random()).toString(16);
   container.appendChild(
-    <div>
-      <input ref={nameRef} type="text" placeholder="name" value="newbie" />
-      <input ref={colorRef} type="color" placeholder="color" />
-      <button onclick={onClick.resolve}>Go</button>
+    <div className="container">
+      <form>
+        <input
+          id="color-picker"
+          ref={colorRef}
+          type="color"
+          value={`#${randomColor}`}
+        />
+        <input
+          id="name-picker"
+          ref={nameRef}
+          type="text"
+          placeholder="name"
+          value="newbie"
+        />
+      </form>
+      <div>
+        <button onclick={onClick.resolve}>Go</button>
+      </div>
     </div>
   );
   await onClick.promise;

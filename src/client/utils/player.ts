@@ -39,7 +39,15 @@ export class Player {
       this.keyboardStatus[ev.key] = false;
     });
     this.canvas.addEventListener("click", ev => {
-      this.pointing.assign({ x: ev.clientX, y: ev.clientY });
+      const boundingRect = this.canvas.getBoundingClientRect();
+      this.pointing.assign({
+        x:
+          ((ev.clientX - boundingRect.left) / boundingRect.width) *
+          this.canvas.width,
+        y:
+          ((ev.clientY - boundingRect.top) / boundingRect.height) *
+          this.canvas.height
+      });
       this.shooting = true;
     });
   }
