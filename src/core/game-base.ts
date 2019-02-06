@@ -1,10 +1,11 @@
 import { Point, IPoint } from "./point";
-import { ClientMessages } from "./messages";
+import { ClientMessages, IPlayer } from "./messages";
 
 const SHOOT_COOLDOWN = 60;
 const SPEED = 1;
 
-export class Player {
+export class Player implements IPlayer {
+  life: number = 100;
   lastMessage = "";
   name: string = "";
   color: string = "";

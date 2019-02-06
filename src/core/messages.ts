@@ -5,6 +5,7 @@ export interface IPlayer {
   name: string;
   color: string;
   position: IPoint;
+  life: number;
 }
 
 export interface ClientMessages {

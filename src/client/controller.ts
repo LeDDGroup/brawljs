@@ -96,7 +96,7 @@ export class Controller {
       this.context.fillStyle = "red";
       this.context.textAlign = "center";
       this.context.fillText(
-        player.name,
+        `${player.life.toString()} ${player.name}`,
         player.position.x,
         player.position.y - 10
       );
