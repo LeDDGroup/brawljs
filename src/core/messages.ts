@@ -21,6 +21,7 @@ export interface ClientMessages {
 export interface IShot {
   position: IPoint;
   speed: IPoint;
+  playerId: string,
 }
 
 export interface ServerMessages {

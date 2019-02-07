@@ -87,7 +87,7 @@ export class Controller {
       this.context.arc(
         player.position.x,
         player.position.y,
-        10,
+        player.radius,
         0,
         2 * Math.PI
       );
@@ -106,7 +106,13 @@ export class Controller {
       this.context.save();
       this.context.fillStyle = "blue";
       this.context.beginPath();
-      this.context.arc(shot.position.x, shot.position.y, 5, 0, 2 * Math.PI);
+      this.context.arc(
+        shot.position.x,
+        shot.position.y,
+        shot.radius,
+        0,
+        2 * Math.PI
+      );
       this.context.closePath();
       this.context.fill();
       this.context.restore();

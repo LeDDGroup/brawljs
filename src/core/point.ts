@@ -66,10 +66,21 @@ export class Point implements IPoint {
   }
   public top(length: number): Point {
     if (this.x !== 0 || this.y !== 0) {
-      const angle = Math.atan2(this.y, this.x);
+      const angle = this.getAngle();
       this.x = Math.cos(angle) * length;
       this.y = Math.sin(angle) * length;
     }
+    return this;
+  }
+  public getLength(): number {
+    return this.y / Math.sin(this.getAngle());
+  }
+  public getAngle(): number {
+    return Math.atan2(this.y, this.x);
+  }
+  public abs(): Point {
+    this.x = Math.abs(this.x);
+    this.y = Math.abs(this.y);
     return this;
   }
 }

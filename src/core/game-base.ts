@@ -1,18 +1,22 @@
 import { Point, IPoint } from "./point";
 import { ClientMessages, IPlayer } from "./messages";
+import { Circle } from "./shape";
 
 const SHOOT_COOLDOWN = 60;
 const SPEED = 1;
+const SHOT_SIZE = 5;
+const PLAYER_SIZE = 10;
 
-export class Player implements IPlayer {
+export class Player extends Circle implements IPlayer {
   life: number = 100;
   lastMessage = "";
   name: string = "";
   color: string = "";
-  position: Point = new Point();
   speed: Point = new Point();
   shootCooldown: number = 0;
-  constructor(public id: string) {}
+  constructor(public id: string) {
+    super(PLAYER_SIZE);
+  }
   sync(status: { speed: IPoint }) {
     this.speed.assign(status.speed).top(SPEED);
   }
@@ -24,11 +28,14 @@ export class Player implements IPlayer {
   }
 }
 
-export class Shot {
+export class Shot extends Circle {
+  playerId: Player["id"];
   life = 30;
   position: Point;
   speed: Point;
-  constructor(position: IPoint, speed: IPoint) {
+  constructor(position: IPoint, speed: IPoint, playerId: Player["id"]) {
+    super(SHOT_SIZE);
+    this.playerId = playerId;
     this.position = new Point(position);
     this.speed = new Point(speed);
   }
@@ -50,6 +57,14 @@ export class GameBase {
     }
     for (let i = 0; i < this.shots.length; i++) {
       const shot = this.shots[i];
+      const damage = 50;
+      for (const key in this.players) {
+        const player = this.players[key];
+        if (shot.playerId !== player.id && player.collides(shot)) {
+          player.life -= damage;
+          shot.life = 0;
+        }
+      }
       shot.update();
       if (shot.life <= 0) this.shots.splice(i, 1);
     }
@@ -61,7 +76,7 @@ export class GameBase {
     if (data.shoot && player.shootCooldown <= 0) {
       player.shootCooldown = SHOOT_COOLDOWN;
       const speed = new Point(data.shootDirection).top(3);
-      this.shots.push(new Shot(player.position, speed));
+      this.shots.push(new Shot(player.position, speed, player.id));
     }
   }
 }

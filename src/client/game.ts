@@ -12,7 +12,8 @@ export class Game extends GameBase {
       player.position.assign(newData.position);
       player.color = newData.color;
       player.name = newData.name;
+      player.life = newData.life;
     }
-    this.shots = data.shots.map(shot => new Shot(shot.position, shot.speed));
+    this.shots = data.shots.map(shot => new Shot(shot.position, shot.speed, shot.playerId));
   }
 }
