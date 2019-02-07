@@ -1,11 +1,14 @@
 import { ServerMessages, ClientMessages } from "../core/messages";
 import { GameBase, Player } from "../core/game-base";
-import { WORLD_SIZE } from "../core/map";
+import { WORLD_SIZE, PLAYER_SPAWN_POINTS, BLOCK_SIZE } from "../core/map";
+import { Point } from "../core/point";
 
 export class Game extends GameBase {
   addPlayer(id: string, data: ClientMessages["newPlayer"]) {
     const player = new Player(id);
-    player.position = this.size.copy().divide(2);
+    player.position = new Point(getRandom(PLAYER_SPAWN_POINTS))
+      .multiply(BLOCK_SIZE)
+      .sum(BLOCK_SIZE / 2);
     player.color = data.color;
     player.name = data.name;
     this.players[id] = player;
@@ -21,4 +24,8 @@ export class Game extends GameBase {
   getState(): ServerMessages["sync"] {
     return { players: this.players, shots: this.shots };
   }
+}
+
+function getRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * (arr.length - 1))];
 }

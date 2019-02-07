@@ -1,9 +1,11 @@
-import { Point } from "./point";
+import { Point, IPoint } from "./point";
 
 export const BLOCK_EMPTY = 0;
 export const BLOCK_FULL = 1;
 export const BLOCK_PLAYER_SPAWN = 2;
 export const BLOCK_SIZE = 32;
+
+export const PLAYER_SPAWN_POINTS: IPoint[] = [];
 
 export const MAP = `
 111111111111
@@ -21,11 +23,15 @@ export const MAP = `
 `
   .trim()
   .split("\n")
-  .map(el =>
+  .map((el, y) =>
     el
       .split("")
-      .map(s =>
-        s === "0" ? BLOCK_EMPTY : s === "p" ? BLOCK_PLAYER_SPAWN : BLOCK_FULL
+      .map((s, x) =>
+        s === "0"
+          ? BLOCK_EMPTY
+          : s === "p"
+          ? (PLAYER_SPAWN_POINTS.push({ y, x }), BLOCK_PLAYER_SPAWN)
+          : BLOCK_FULL
       )
   );
 
