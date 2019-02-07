@@ -79,6 +79,11 @@ export class Controller {
   }
   draw() {
     this.context.clearRect(0, 0, 800, 600);
+    this.drawPlayers();
+    this.drawShots();
+    this.drawRespawnCooldown();
+  }
+  drawPlayers() {
     for (const id in this.game.players) {
       const player = this.game.players[id];
       if (player.life <= 0) continue;
@@ -103,6 +108,8 @@ export class Controller {
       );
       this.context.restore();
     }
+  }
+  drawShots() {
     for (const shot of this.game.shots) {
       this.context.save();
       this.context.fillStyle = "blue";
@@ -118,11 +125,13 @@ export class Controller {
       this.context.fill();
       this.context.restore();
     }
+  }
+  drawRespawnCooldown() {
     const playerCooldown = this.game.players[this.id].deadCooldown;
     if (playerCooldown > 0) {
       this.context.save();
       this.context.textAlign = "center";
-      this.context.font = "2rem sans-serif"
+      this.context.font = "2rem sans-serif";
       this.context.fillText(
         Math.ceil(playerCooldown / 60).toString(),
         this.canvas.width / 2,
