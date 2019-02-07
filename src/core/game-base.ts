@@ -60,7 +60,11 @@ export class GameBase {
       const damage = 50;
       for (const key in this.players) {
         const player = this.players[key];
-        if (shot.playerId !== player.id && player.collides(shot)) {
+        if (
+          player.life > 0 &&
+          shot.playerId !== player.id &&
+          player.collides(shot)
+        ) {
           player.life -= damage;
           shot.life = 0;
         }
@@ -71,6 +75,7 @@ export class GameBase {
   }
   syncPlayer(id: string, data: ClientMessages["update"]) {
     const player = this.players[id];
+    if (player.life <= 0) return;
     player.lastMessage = data.messageId;
     player.sync(data);
     if (data.shoot && player.shootCooldown <= 0) {

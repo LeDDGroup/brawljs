@@ -81,6 +81,7 @@ export class Controller {
     this.context.clearRect(0, 0, 800, 600);
     for (const id in this.game.players) {
       const player = this.game.players[id];
+      if (player.life <= 0) continue;
       this.context.save();
       this.context.fillStyle = player.color;
       this.context.beginPath();
