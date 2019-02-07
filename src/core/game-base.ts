@@ -1,19 +1,23 @@
 import { Point, IPoint } from "./point";
-import { ClientMessages, IPlayer } from "./messages";
+import { ClientMessages } from "./messages";
 import { Circle } from "./shape";
 
+const START_LIFE = 100;
 const SHOOT_COOLDOWN = 60;
 const SPEED = 1;
 const SHOT_SIZE = 5;
 const PLAYER_SIZE = 10;
+const DEAD_COOLDOWN = 180;
+const SHOT_DAMAGE = 50;
 
-export class Player extends Circle implements IPlayer {
-  life: number = 100;
+export class Player extends Circle {
+  life: number = START_LIFE;
   lastMessage = "";
   name: string = "";
   color: string = "";
   speed: Point = new Point();
   shootCooldown: number = 0;
+  deadCooldown: number = 0;
   constructor(public id: string) {
     super(PLAYER_SIZE);
   }
@@ -24,7 +28,12 @@ export class Player extends Circle implements IPlayer {
     if (this.shootCooldown > 0) {
       this.shootCooldown--;
     }
-    this.position.sum(this.speed);
+    if (this.deadCooldown > 0) {
+      this.deadCooldown--;
+    }
+    if (this.life > 0) {
+      this.position.sum(this.speed);
+    }
   }
 }
 
@@ -53,11 +62,14 @@ export class GameBase {
   size = new Point({ x: 600, y: 600 });
   update() {
     for (const id in this.players) {
-      this.players[id].update();
+      const player = this.players[id];
+      player.update();
+      if (player.life <= 0 && player.deadCooldown <= 0) {
+        player.life = START_LIFE;
+      }
     }
     for (let i = 0; i < this.shots.length; i++) {
       const shot = this.shots[i];
-      const damage = 50;
       for (const key in this.players) {
         const player = this.players[key];
         if (
@@ -65,8 +77,11 @@ export class GameBase {
           shot.playerId !== player.id &&
           player.collides(shot)
         ) {
-          player.life -= damage;
+          player.life -= SHOT_DAMAGE;
           shot.life = 0;
+          if (player.life <= 0) {
+            player.deadCooldown = DEAD_COOLDOWN;
+          }
         }
       }
       shot.update();
@@ -75,8 +90,8 @@ export class GameBase {
   }
   syncPlayer(id: string, data: ClientMessages["update"]) {
     const player = this.players[id];
-    if (player.life <= 0) return;
     player.lastMessage = data.messageId;
+    if (player.life <= 0) return;
     player.sync(data);
     if (data.shoot && player.shootCooldown <= 0) {
       player.shootCooldown = SHOOT_COOLDOWN;

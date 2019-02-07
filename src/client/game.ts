@@ -18,6 +18,7 @@ export class Game extends GameBase {
       player.color = newData.color;
       player.name = newData.name;
       player.life = newData.life;
+      player.deadCooldown = newData.deadCooldown;
     }
     this.shots = data.shots.map(
       shot => new Shot(shot.position, shot.speed, shot.playerId)

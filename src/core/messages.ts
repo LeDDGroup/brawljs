@@ -1,12 +1,5 @@
 import { IPoint } from "./point";
-
-export interface IPlayer {
-  lastMessage: string;
-  name: string;
-  color: string;
-  position: IPoint;
-  life: number;
-}
+import { Player, Shot } from "./game-base";
 
 export interface ClientMessages {
   newPlayer: { name: string; color: string };
@@ -18,16 +11,10 @@ export interface ClientMessages {
   };
 }
 
-export interface IShot {
-  position: IPoint;
-  speed: IPoint;
-  playerId: string,
-}
-
 export interface ServerMessages {
   sync: {
-    players: Record<any, IPlayer>;
-    shots: IShot[];
+    players: Record<any, Player>;
+    shots: Shot[];
     size: IPoint;
   };
 }
