@@ -118,6 +118,18 @@ export class Controller {
       this.context.fill();
       this.context.restore();
     }
+    const playerCooldown = this.game.players[this.id].deadCooldown;
+    if (playerCooldown > 0) {
+      this.context.save();
+      this.context.textAlign = "center";
+      this.context.font = "2rem sans-serif"
+      this.context.fillText(
+        Math.ceil(playerCooldown / 60).toString(),
+        this.canvas.width / 2,
+        this.canvas.height / 2
+      );
+      this.context.restore();
+    }
   }
   get id() {
     return this.socket.id;
