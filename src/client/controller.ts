@@ -7,6 +7,7 @@ import {
   ClientMessages,
   ServerMessages
 } from "../core/messages";
+import { MAP, BLOCK_SIZE, WORLD_SIZE_BLOCKS, BLOCK_FULL } from "../core/map";
 
 export class Controller {
   game = new Game();
@@ -79,9 +80,25 @@ export class Controller {
   }
   draw() {
     this.context.clearRect(0, 0, 800, 600);
+    this.drawMap();
     this.drawPlayers();
     this.drawShots();
     this.drawRespawnCooldown();
+  }
+  drawMap() {
+    this.context.save();
+    for (let y = 0; y < WORLD_SIZE_BLOCKS.y; y++) {
+      for (let x = 0; x < WORLD_SIZE_BLOCKS.x; x++) {
+        if (MAP[y][x] === BLOCK_FULL)
+          this.context.fillRect(
+            x * BLOCK_SIZE,
+            y * BLOCK_SIZE,
+            BLOCK_SIZE,
+            BLOCK_SIZE
+          );
+      }
+    }
+    this.context.restore();
   }
   drawPlayers() {
     for (const id in this.game.players) {

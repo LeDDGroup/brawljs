@@ -1,0 +1,37 @@
+import { Point } from "./point";
+
+export const BLOCK_EMPTY = 0;
+export const BLOCK_FULL = 1;
+export const BLOCK_PLAYER_SPAWN = 2;
+export const BLOCK_SIZE = 32;
+
+export const MAP = `
+111111111111
+1p00000000p1
+101110011101
+100000000001
+100111111001
+100010000001
+100000010001
+100111111001
+100000000001
+101110011101
+1p00000000p1
+111111111111
+`
+  .trim()
+  .split("\n")
+  .map(el =>
+    el
+      .split("")
+      .map(s =>
+        s === "0" ? BLOCK_EMPTY : s === "p" ? BLOCK_PLAYER_SPAWN : BLOCK_FULL
+      )
+  );
+
+export const WORLD_SIZE_BLOCKS = new Point({
+  x: MAP[0].length,
+  y: MAP.length
+});
+
+export const WORLD_SIZE = WORLD_SIZE_BLOCKS.copy().multiply(BLOCK_SIZE);

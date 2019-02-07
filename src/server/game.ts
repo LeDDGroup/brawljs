@@ -1,5 +1,6 @@
 import { ServerMessages, ClientMessages } from "../core/messages";
 import { GameBase, Player } from "../core/game-base";
+import { WORLD_SIZE } from "../core/map";
 
 export class Game extends GameBase {
   addPlayer(id: string, data: ClientMessages["newPlayer"]) {
@@ -12,7 +13,12 @@ export class Game extends GameBase {
   removePlayer(id: string) {
     delete this.players[id];
   }
+  getMap(): ServerMessages["map"] {
+    return {
+      size: WORLD_SIZE
+    };
+  }
   getState(): ServerMessages["sync"] {
-    return { players: this.players, shots: this.shots, size: this.size };
+    return { players: this.players, shots: this.shots };
   }
 }

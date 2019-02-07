@@ -42,6 +42,7 @@ class Server {
   }
   private onConnection = (socket: Socket) => {
     // TODO validate input
+    socket.emit("map", this.game.getMap());
     socket.on("disconnect", () => {
       this.game.removePlayer(socket.id);
     });

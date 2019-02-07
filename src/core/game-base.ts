@@ -1,6 +1,7 @@
 import { Point, IPoint } from "./point";
 import { ClientMessages } from "./messages";
 import { Circle } from "./shape";
+import { WORLD_SIZE } from "./map";
 
 const START_LIFE = 100;
 const SHOOT_COOLDOWN = 60;
@@ -59,7 +60,7 @@ export class Shot extends Circle {
 export class GameBase {
   players: Record<keyof any, Player> = {};
   shots: Shot[] = [];
-  size = new Point({ x: 600, y: 600 });
+  size = new Point(WORLD_SIZE.copy());
   update() {
     for (const id in this.players) {
       const player = this.players[id];

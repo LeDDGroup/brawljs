@@ -12,10 +12,12 @@ export interface ClientMessages {
 }
 
 export interface ServerMessages {
+  map: {
+    size: IPoint;
+  };
   sync: {
     players: Record<any, Player>;
     shots: Shot[];
-    size: IPoint;
   };
 }
 
