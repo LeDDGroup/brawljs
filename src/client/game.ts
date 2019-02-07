@@ -3,6 +3,11 @@ import { ServerMessages } from "../core/messages";
 
 export class Game extends GameBase {
   sync(data: ServerMessages["sync"]) {
+    for (const id in this.players) {
+      if (data.players[id] === undefined) {
+        delete this.players[id];
+      }
+    }
     for (const id in data.players) {
       const newData = data.players[id];
       if (!this.players[id]) {
@@ -14,6 +19,8 @@ export class Game extends GameBase {
       player.name = newData.name;
       player.life = newData.life;
     }
-    this.shots = data.shots.map(shot => new Shot(shot.position, shot.speed, shot.playerId));
+    this.shots = data.shots.map(
+      shot => new Shot(shot.position, shot.speed, shot.playerId)
+    );
   }
 }
