@@ -11,5 +11,5 @@ Fast paced multiplayer game in javascript
 
 ```sh
 npm install
-npm start
+npm run dev
 ```
