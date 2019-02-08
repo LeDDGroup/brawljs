@@ -5,9 +5,10 @@ import { WORLD_SIZE } from "./map";
 
 const START_LIFE = 100;
 const SHOOT_COOLDOWN = 60;
-const SPEED = 1;
-const SHOT_SIZE = 5;
-const PLAYER_SIZE = 10;
+const PLAYER_SPEED = 0.03;
+const PLAYER_SIZE = 0.3;
+const SHOT_SIZE = 0.15;
+const SHOT_SPEED = 0.1;
 const DEAD_COOLDOWN = 180;
 const SHOT_DAMAGE = 50;
 
@@ -23,7 +24,7 @@ export class Player extends Circle {
     super(PLAYER_SIZE);
   }
   sync(status: { speed: IPoint }) {
-    this.speed.assign(status.speed).top(SPEED);
+    this.speed.assign(status.speed).top(PLAYER_SPEED);
   }
 }
 
@@ -99,7 +100,7 @@ export class GameBase {
     player.sync(data);
     if (data.shoot && player.shootCooldown <= 0) {
       player.shootCooldown = SHOOT_COOLDOWN;
-      const speed = new Point(data.shootDirection).top(3);
+      const speed = new Point(data.shootDirection).top(SHOT_SPEED);
       this.shots.push(new Shot(player.position, speed, player.id));
     }
   }

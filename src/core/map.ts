@@ -3,7 +3,6 @@ import { Point, IPoint } from "./point";
 export const BLOCK_EMPTY = 0;
 export const BLOCK_FULL = 1;
 export const BLOCK_PLAYER_SPAWN = 2;
-export const BLOCK_SIZE = 32;
 
 export const PLAYER_SPAWN_POINTS: IPoint[] = [];
 
@@ -35,9 +34,7 @@ export const MAP = `
       )
   );
 
-export const WORLD_SIZE_BLOCKS = new Point({
+export const WORLD_SIZE = new Point({
   x: MAP[0].length,
   y: MAP.length
 });
-
-export const WORLD_SIZE = WORLD_SIZE_BLOCKS.copy().multiply(BLOCK_SIZE);

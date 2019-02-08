@@ -1,14 +1,12 @@
 import { ServerMessages, ClientMessages } from "../core/messages";
 import { GameBase, Player } from "../core/game-base";
-import { WORLD_SIZE, PLAYER_SPAWN_POINTS, BLOCK_SIZE } from "../core/map";
+import { WORLD_SIZE, PLAYER_SPAWN_POINTS } from "../core/map";
 import { Point } from "../core/point";
 
 export class Game extends GameBase {
   addPlayer(id: string, data: ClientMessages["newPlayer"]) {
     const player = new Player(id);
-    player.position = new Point(getRandom(PLAYER_SPAWN_POINTS))
-      .multiply(BLOCK_SIZE)
-      .sum(BLOCK_SIZE / 2);
+    player.position = new Point(getRandom(PLAYER_SPAWN_POINTS)).sum(0.5);
     player.color = data.color;
     player.name = data.name;
     this.players[id] = player;

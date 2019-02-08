@@ -7,7 +7,9 @@ import {
   ClientMessages,
   ServerMessages
 } from "../core/messages";
-import { MAP, BLOCK_SIZE, WORLD_SIZE_BLOCKS, BLOCK_FULL } from "../core/map";
+import { MAP, BLOCK_FULL, WORLD_SIZE } from "../core/map";
+
+export const BLOCK_SIZE = 32;
 
 export class Controller {
   game = new Game();
@@ -69,7 +71,10 @@ export class Controller {
     const update = {
       ...baseUpdate,
       shoot: this.playerInput.shooting,
-      shootDirection: this.playerInput.pointing.copy().subtract(player.position)
+      shootDirection: this.playerInput.pointing
+        .copy()
+        .divide(BLOCK_SIZE)
+        .subtract(player.position)
     };
     this.socket.emit("update", update);
     this.messages.push(baseUpdate);
@@ -87,8 +92,8 @@ export class Controller {
   }
   drawMap() {
     this.context.save();
-    for (let y = 0; y < WORLD_SIZE_BLOCKS.y; y++) {
-      for (let x = 0; x < WORLD_SIZE_BLOCKS.x; x++) {
+    for (let y = 0; y < WORLD_SIZE.y; y++) {
+      for (let x = 0; x < WORLD_SIZE.x; x++) {
         if (MAP[y][x] === BLOCK_FULL)
           this.context.fillRect(
             x * BLOCK_SIZE,
@@ -108,9 +113,9 @@ export class Controller {
       this.context.fillStyle = player.color;
       this.context.beginPath();
       this.context.arc(
-        player.position.x,
-        player.position.y,
-        player.radius,
+        player.position.x * BLOCK_SIZE,
+        player.position.y * BLOCK_SIZE,
+        player.radius * BLOCK_SIZE,
         0,
         2 * Math.PI
       );
@@ -120,8 +125,8 @@ export class Controller {
       this.context.textAlign = "center";
       this.context.fillText(
         `${player.life.toString()} ${player.name}`,
-        player.position.x,
-        player.position.y - 10
+        player.position.x * BLOCK_SIZE,
+        player.position.y * BLOCK_SIZE - 10
       );
       this.context.restore();
     }
@@ -132,9 +137,9 @@ export class Controller {
       this.context.fillStyle = "blue";
       this.context.beginPath();
       this.context.arc(
-        shot.position.x,
-        shot.position.y,
-        shot.radius,
+        shot.position.x * BLOCK_SIZE,
+        shot.position.y * BLOCK_SIZE,
+        shot.radius * BLOCK_SIZE,
         0,
         2 * Math.PI
       );

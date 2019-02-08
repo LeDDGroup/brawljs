@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-import { Controller } from "../controller";
+import { Controller, BLOCK_SIZE } from "../controller";
 import { removeChildren } from "./remove-children";
 import { createElement } from "tsx-create-html-element";
 import defer from "p-defer";
@@ -28,8 +28,8 @@ export async function play(info: { name: string; color: string }) {
   socket.on("map", onMap.resolve);
   await onConnect.promise;
   const { size } = await onMap.promise;
-  canvasRef.value.width = size.x;
-  canvasRef.value.height = size.y;
+  canvasRef.value.width = size.x * BLOCK_SIZE;
+  canvasRef.value.height = size.y * BLOCK_SIZE;
   const controller = new Controller(context, socket, info, canvasRef.value);
   controller.setup();
   controller.start();
