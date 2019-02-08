@@ -1,7 +1,7 @@
 import { Point, IPoint } from "./point";
 import { ClientMessages } from "./messages";
 import { Circle, Rect } from "./shape";
-import { WORLD_SIZE, BLOCK_FULL, MAP } from "./map";
+import { WORLD_SIZE, BLOCK_FULL, MAP, PLAYER_SPAWN_POINTS } from "./map";
 
 const START_LIFE = 100;
 const SHOOT_COOLDOWN = 60;
@@ -66,6 +66,7 @@ export class GameBase {
       }
       if (player.life <= 0 && player.deadCooldown <= 0) {
         player.life = START_LIFE;
+        player.position.assign(this.getRandomPlayerPosition());
       }
       if (player.life > 0) {
         player.position.sum(
@@ -131,4 +132,11 @@ export class GameBase {
       this.shots.push(new Shot(player.position, speed, player.id));
     }
   }
+  getRandomPlayerPosition(): IPoint {
+    return new Point(getRandom(PLAYER_SPAWN_POINTS)).sum(0.5);
+  }
+}
+
+function getRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * (arr.length - 1))];
 }
