@@ -71,20 +71,11 @@ export class Controller {
       shootDirection: { x: 0, y: 0 }
     };
 
-    const playerPosition = this.player.position.copy().multiply(BLOCK_SIZE);
-    const shootDirection = this.playerInput.pointing
-      .copy()
-      .sum(playerPosition)
-      .subtract({ x: this.canvas.width / 2, y: this.canvas.height / 2 })
-      .subtract(playerPosition);
-    if (this.playerInput.shooting) {
-      console.log(shootDirection);
-    }
 
     const update = {
       ...baseUpdate,
       shoot: this.playerInput.shooting,
-      shootDirection
+        shootDirection: this.playerInput.pointing,
     };
     this.socket.emit("update", update);
     this.messages.push(baseUpdate);

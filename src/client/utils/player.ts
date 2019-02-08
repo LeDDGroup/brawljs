@@ -38,16 +38,16 @@ export class Player {
       }
       this.keyboardStatus[ev.key] = false;
     });
-    this.canvas.addEventListener("click", ev => {
-      const boundingRect = this.canvas.getBoundingClientRect();
-      this.pointing.assign({
-        x:
-          ((ev.clientX - boundingRect.left) / boundingRect.width) *
-          this.canvas.width,
-        y:
-          ((ev.clientY - boundingRect.top) / boundingRect.height) *
-          this.canvas.height
-      });
+    window.addEventListener("click", ev => {
+      this.pointing
+        .assign({
+          x: ev.clientX,
+          y: ev.clientY
+        })
+        .subtract({
+          x: document.documentElement.clientWidth / 2,
+          y: document.documentElement.clientHeight / 2
+        });
       this.shooting = true;
     });
   }
