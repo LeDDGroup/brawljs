@@ -71,11 +71,10 @@ export class Controller {
       shootDirection: { x: 0, y: 0 }
     };
 
-
     const update = {
       ...baseUpdate,
       shoot: this.playerInput.shooting,
-        shootDirection: this.playerInput.pointing,
+      shootDirection: this.playerInput.pointing
     };
     this.socket.emit("update", update);
     this.messages.push(baseUpdate);
@@ -104,8 +103,8 @@ export class Controller {
           this.context.fillRect(
             x * BLOCK_SIZE,
             y * BLOCK_SIZE,
-            BLOCK_SIZE,
-            BLOCK_SIZE
+            BLOCK_SIZE + 1,
+            BLOCK_SIZE + 1
           );
       }
     }
