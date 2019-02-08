@@ -15,16 +15,16 @@ canvas {
     margin: 0;
     border: 0;
     max-width: 96vw;
-    max-height: 64vw;
-    width: 144vh;
+    max-height: 72vw;
+    width: 128vh;
     height: 96vh;
 }
 
 @media (orientation: portrait) {
     canvas {
         width: 96vw;
-        height: 64vw;
-        max-width: 144vh;
+        height: 72vw;
+        max-width: 128vh;
         max-height: 96vh;
     }
 }
