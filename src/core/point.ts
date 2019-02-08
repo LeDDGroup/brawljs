@@ -45,14 +45,20 @@ export class Point implements IPoint {
     this.y -= point.y || 0;
     return this;
   }
-  public multiply(index: number): Point {
-    this.x *= index;
-    this.y *= index;
+  public multiply(point: Partial<IPoint> | number): Point {
+    if (typeof point === "number") {
+      point = { x: point, y: point };
+    }
+    this.x *= point.x !== undefined ? point.x : 1;
+    this.y *= point.y !== undefined ? point.y : 1;
     return this;
   }
-  public divide(index: number): Point {
-    this.x /= index;
-    this.y /= index;
+  public divide(point: Partial<IPoint> | number): Point {
+    if (typeof point === "number") {
+      point = { x: point, y: point };
+    }
+    this.x /= point.x !== undefined ? point.x : 1;
+    this.y /= point.y !== undefined ? point.y : 1;
     return this;
   }
   public inverse(): Point {

@@ -1,9 +1,15 @@
 import io from "socket.io-client";
-import { Controller, BLOCK_SIZE } from "../controller";
+import { Controller } from "../controller";
 import { removeChildren } from "./remove-children";
 import { createElement } from "tsx-create-html-element";
 import defer from "p-defer";
 import { ServerMessages } from "../../core/messages";
+import { Point } from "../../core/point";
+
+export const CANVAS_SIZE = new Point({
+  x: 640,
+  y: 480
+});
 
 export async function play(info: { name: string; color: string }) {
   const container = document.getElementById("app");
@@ -27,9 +33,8 @@ export async function play(info: { name: string; color: string }) {
   socket.connect();
   socket.on("map", onMap.resolve);
   await onConnect.promise;
-  const { size } = await onMap.promise;
-  canvasRef.value.width = size.x * BLOCK_SIZE;
-  canvasRef.value.height = size.y * BLOCK_SIZE;
+  canvasRef.value.width = CANVAS_SIZE.x;
+  canvasRef.value.height = CANVAS_SIZE.y;
   const controller = new Controller(context, socket, info, canvasRef.value);
   controller.setup();
   controller.start();

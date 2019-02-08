@@ -9,7 +9,7 @@ import {
 } from "../core/messages";
 import { MAP, BLOCK_FULL, WORLD_SIZE } from "../core/map";
 
-export const BLOCK_SIZE = 32;
+export const BLOCK_SIZE = 48;
 
 export class Controller {
   game = new Game();
@@ -18,6 +18,9 @@ export class Controller {
     keybindings: { left: "a", right: "d", up: "w", down: "s" },
     canvas: this.canvas
   });
+  public get player() {
+    return this.game.players[this.id];
+  }
   constructor(
     public context: CanvasRenderingContext2D,
     public socket: ExtendedSocket,
@@ -61,20 +64,27 @@ export class Controller {
     }, 1000 / 60);
   }
   update() {
-    const player = this.game.players[this.id];
     const baseUpdate: ClientMessages["update"] = {
       messageId: Date.now().toString(),
       speed: this.playerInput.moving(),
       shoot: false,
       shootDirection: { x: 0, y: 0 }
     };
+
+    const playerPosition = this.player.position.copy().multiply(BLOCK_SIZE);
+    const shootDirection = this.playerInput.pointing
+      .copy()
+      .sum(playerPosition)
+      .subtract({ x: this.canvas.width / 2, y: this.canvas.height / 2 })
+      .subtract(playerPosition);
+    if (this.playerInput.shooting) {
+      console.log(shootDirection);
+    }
+
     const update = {
       ...baseUpdate,
       shoot: this.playerInput.shooting,
-      shootDirection: this.playerInput.pointing
-        .copy()
-        .divide(BLOCK_SIZE)
-        .subtract(player.position)
+      shootDirection
     };
     this.socket.emit("update", update);
     this.messages.push(baseUpdate);
@@ -84,11 +94,16 @@ export class Controller {
     this.playerInput.resetInput();
   }
   draw() {
-    this.context.clearRect(0, 0, 800, 600);
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.translate(
+      -this.player.position.x * BLOCK_SIZE + this.canvas.width / 2,
+      -this.player.position.y * BLOCK_SIZE + this.canvas.height / 2
+    );
     this.drawMap();
     this.drawPlayers();
     this.drawShots();
     this.drawRespawnCooldown();
+    this.context.resetTransform();
   }
   drawMap() {
     this.context.save();
@@ -149,7 +164,7 @@ export class Controller {
     }
   }
   drawRespawnCooldown() {
-    const playerCooldown = this.game.players[this.id].deadCooldown;
+    const playerCooldown = this.player.deadCooldown;
     if (playerCooldown > 0) {
       this.context.save();
       this.context.textAlign = "center";
