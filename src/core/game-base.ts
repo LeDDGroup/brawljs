@@ -1,7 +1,7 @@
 import { Point, IPoint } from "./point";
 import { ClientMessages } from "./messages";
-import { Circle } from "./shape";
-import { WORLD_SIZE } from "./map";
+import { Circle, Rect } from "./shape";
+import { WORLD_SIZE, BLOCK_FULL, MAP } from "./map";
 
 const START_LIFE = 100;
 const SHOOT_COOLDOWN = 60;
@@ -67,7 +67,9 @@ export class GameBase {
       if (player.life <= 0 && player.deadCooldown <= 0) {
         player.life = START_LIFE;
       }
-      if (player.life > 0) {
+      const nextPosition = player.toRect();
+      nextPosition.position.sum(player.speed);
+      if (player.life > 0 && !this.checkCollision(nextPosition)) {
         player.position.sum(player.speed);
       }
     }
@@ -89,9 +91,26 @@ export class GameBase {
           }
         }
       }
-      shot.update();
+      const nextPosition = shot.toRect();
+      nextPosition.position.sum(shot.speed);
+      if (this.checkCollision(nextPosition)) shot.life = 0;
+      if (shot.life) shot.update();
       if (shot.life <= 0) this.shots.splice(i, 1);
     }
+  }
+  checkCollision(rect: Rect): boolean {
+    const starty = Math.floor(rect.position.y);
+    const endy = Math.ceil(rect.position.y + rect.size.y);
+    const startx = Math.floor(rect.position.x);
+    const endx = Math.ceil(rect.position.x + rect.size.x);
+    for (let y = starty; y < endy; y++) {
+      for (let x = startx; x < endx; x++) {
+        if (MAP[y][x] === BLOCK_FULL) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
   syncPlayer(id: string, data: ClientMessages["update"]) {
     const player = this.players[id];
