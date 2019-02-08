@@ -6,7 +6,7 @@ export const BLOCK_PLAYER_SPAWN = 2;
 
 export const PLAYER_SPAWN_POINTS: IPoint[] = [];
 
-export const MAP = `
+export const MAP = getMapFromString(`
 111111111111
 1p00000000p1
 101110011101
@@ -19,22 +19,26 @@ export const MAP = `
 101110011101
 1p00000000p1
 111111111111
-`
-  .trim()
-  .split("\n")
-  .map((el, y) =>
-    el
-      .split("")
-      .map((s, x) =>
-        s === "0"
-          ? BLOCK_EMPTY
-          : s === "p"
-          ? (PLAYER_SPAWN_POINTS.push({ y, x }), BLOCK_PLAYER_SPAWN)
-          : BLOCK_FULL
-      )
-  );
+`);
 
 export const WORLD_SIZE = new Point({
   x: MAP[0].length,
   y: MAP.length
 });
+
+function getMapFromString(map: string) {
+  return map
+    .trim()
+    .split("\n")
+    .map((el, y) =>
+         el
+         .split("")
+         .map((s, x) =>
+              s === "0"
+              ? BLOCK_EMPTY
+              : s === "p"
+              ? (PLAYER_SPAWN_POINTS.push({ y, x }), BLOCK_PLAYER_SPAWN)
+              : BLOCK_FULL
+             )
+        );
+}
