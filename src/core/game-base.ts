@@ -25,17 +25,6 @@ export class Player extends Circle {
   sync(status: { speed: IPoint }) {
     this.speed.assign(status.speed).top(SPEED);
   }
-  update() {
-    if (this.shootCooldown > 0) {
-      this.shootCooldown--;
-    }
-    if (this.deadCooldown > 0) {
-      this.deadCooldown--;
-    }
-    if (this.life > 0) {
-      this.position.sum(this.speed);
-    }
-  }
 }
 
 export class Shot extends Circle {
@@ -62,13 +51,27 @@ export class GameBase {
   shots: Shot[] = [];
   size = new Point(WORLD_SIZE.copy());
   update() {
+    this.updatePlayers();
+    this.updateShots();
+  }
+  updatePlayers() {
     for (const id in this.players) {
       const player = this.players[id];
-      player.update();
+      if (player.shootCooldown > 0) {
+        player.shootCooldown--;
+      }
+      if (player.deadCooldown > 0) {
+        player.deadCooldown--;
+      }
       if (player.life <= 0 && player.deadCooldown <= 0) {
         player.life = START_LIFE;
       }
+      if (player.life > 0) {
+        player.position.sum(player.speed);
+      }
     }
+  }
+  updateShots() {
     for (let i = 0; i < this.shots.length; i++) {
       const shot = this.shots[i];
       for (const key in this.players) {
