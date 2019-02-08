@@ -16,6 +16,13 @@ export class Circle {
         .getLength()
     );
   }
+  toRect(): Rect {
+    const size = this.radius * 2;
+    const rect = new Rect();
+    rect.position.assign(this.position.copy().subtract(this.radius));
+    rect.size.assign({ x: size, y: size });
+    return rect;
+  }
 }
 
 export class Rect {
