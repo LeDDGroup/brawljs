@@ -28,4 +28,13 @@ export class Circle {
 export class Rect {
   position: Point = new Point();
   size: Point = new Point();
+  move = (...args: Parameters<Point["sum"]>) => (
+    this.position.sum(...args), this
+  );
+  rectCopy(): Rect {
+    const newRect = new Rect();
+    newRect.position.assign(this.position);
+    newRect.size.assign(this.size);
+    return newRect;
+  }
 }

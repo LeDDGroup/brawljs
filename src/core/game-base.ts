@@ -67,10 +67,10 @@ export class GameBase {
       if (player.life <= 0 && player.deadCooldown <= 0) {
         player.life = START_LIFE;
       }
-      const nextPosition = player.toRect();
-      nextPosition.position.sum(player.speed);
-      if (player.life > 0 && !this.checkCollision(nextPosition)) {
-        player.position.sum(player.speed);
+      if (player.life > 0) {
+        player.position.sum(
+          this.getSpeedAfterCollision(player.toRect(), player.speed)
+        );
       }
     }
   }
@@ -97,6 +97,14 @@ export class GameBase {
       if (shot.life) shot.update();
       if (shot.life <= 0) this.shots.splice(i, 1);
     }
+  }
+  getSpeedAfterCollision(rect: Rect, speed: Point): IPoint {
+    if (!this.checkCollision(rect.rectCopy().move(speed))) return speed;
+    if (!this.checkCollision(rect.rectCopy().move(new Point({ y: speed.y }))))
+      return new Point({ y: speed.y }).top(speed.getLength());
+    if (!this.checkCollision(rect.rectCopy().move(new Point({ x: speed.x }))))
+      return new Point({ x: speed.x }).top(speed.getLength());
+    return { x: 0, y: 0 };
   }
   checkCollision(rect: Rect): boolean {
     const starty = Math.floor(rect.position.y);

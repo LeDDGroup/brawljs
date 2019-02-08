@@ -67,8 +67,8 @@ export class Point implements IPoint {
   public top(length: number): Point {
     if (this.x !== 0 || this.y !== 0) {
       const angle = this.getAngle();
-      this.x = Math.cos(angle) * length;
-      this.y = Math.sin(angle) * length;
+      this.x = roundToCero(Math.cos(angle) * length);
+      this.y = roundToCero(Math.sin(angle) * length);
     }
     return this;
   }
@@ -83,4 +83,10 @@ export class Point implements IPoint {
     this.y = Math.abs(this.y);
     return this;
   }
+}
+
+function roundToCero(x: number) {
+  // small number
+  if (Math.abs(x) < 0.000015) return 0;
+  return x;
 }
