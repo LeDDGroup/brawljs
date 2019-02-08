@@ -102,8 +102,8 @@ export class Controller {
     this.drawMap();
     this.drawPlayers();
     this.drawShots();
-    this.drawRespawnCooldown();
     this.context.resetTransform();
+    this.drawRespawnCooldown();
   }
   drawMap() {
     this.context.save();
