@@ -1,6 +1,6 @@
-export function render(root: HTMLElement, element: Node) {
+export function render(root: HTMLElement, ...elements: Node[]) {
   removeChildren(root);
-  root.appendChild(element);
+  root.append(...elements);
 }
 
 export function removeChildren(element: HTMLElement) {

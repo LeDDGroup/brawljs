@@ -11,6 +11,12 @@ export class Controller {
   game: Game = new Game();
   interval: NodeJS.Timeout | null = null;
   constructor(public io: Namespace) {}
+  get id() {
+    return this.io.name;
+  }
+  get playerCount() {
+    return Object.keys(this.io.sockets).length;
+  }
   setup() {
     this.io.on("connection", this.onConnection.bind(this));
   }

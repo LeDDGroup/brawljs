@@ -4,28 +4,59 @@ import { resolve } from "path";
 import { createServer, Server as HttpServer } from "http";
 import IO, { Server as SocketServer } from "socket.io";
 import { Controller } from "./controller";
+import bodyParser from "koa-bodyparser";
+import route from "koa-route";
 
 class Server {
   app: Koa;
   server: HttpServer;
   io: SocketServer;
-  controller: Controller;
+  gameCounter = 0;
+  games: Record<string, { controller: Controller; name: string }>;
   constructor(public port: string) {
     this.app = new Koa();
     this.server = createServer(this.app.callback());
     this.io = IO(this.server);
-    this.controller = new Controller(this.io.sockets);
+    this.games = {};
+  }
+  createGame(name: string) {
+    const controller = new Controller(
+      this.io.of((++this.gameCounter).toString())
+    );
+    this.games[controller.id] = { controller, name };
+    controller.setup();
+    controller.start();
+    return controller.id;
+  }
+  removeGame(id: string) {
+    // TODO should check if game exists
+    this.games[id].controller.stop();
   }
   async setup() {
-    this.controller.setup();
     if (process.env.NODE_ENV === "development") {
       this.app.use(await createWebpackMiddleware());
     } else {
       this.app.use(koaStatic(resolve(__dirname, "../client")));
     }
+    this.app.use(bodyParser());
+    this.app.use(
+      route.get("/games", ctx => {
+        ctx.body = Object.keys(this.games).map(id => ({
+          id,
+          name: this.games[id].name,
+          players: this.games[id].controller.playerCount
+        }));
+      })
+    );
+    this.app.use(
+      route.post("/games", ctx => {
+        const name = ctx.request.body.name;
+        const newGameId = this.createGame(name);
+        ctx.body = { id: newGameId };
+      })
+    );
   }
   async start() {
-    this.controller.start();
     return new Promise((s, _) => {
       this.server.listen(this.port, () => {
         s();

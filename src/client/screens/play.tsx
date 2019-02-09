@@ -11,7 +11,11 @@ export const CANVAS_SIZE = new Point({
   y: 480
 });
 
-export async function play(info: { name: string; color: string }) {
+export async function play(info: {
+  name: string;
+  color: string;
+  gameId: string;
+}) {
   const container = document.getElementById("app");
   const canvasRef: JSX.Reference<"canvas"> = {};
 
@@ -25,7 +29,7 @@ export async function play(info: { name: string; color: string }) {
     throw new Error("Context is not supported");
   }
 
-  const socket = io({ autoConnect: false });
+  const socket = io(info.gameId, { autoConnect: false });
   const onConnect = defer();
   const onMap = defer<ServerMessages["map"]>();
   socket.on("connect", onConnect.resolve);

@@ -17,6 +17,8 @@
   "license": "ISC",
   "devDependencies": {
     "@types/koa": "^2.0.48",
+    "@types/koa-bodyparser": "^4.2.1",
+    "@types/koa-route": "^3.2.4",
     "@types/koa-static": "^4.0.0",
     "@types/node": "^10.12.18",
     "@types/p-defer": "^1.0.3",
@@ -38,6 +40,8 @@
   },
   "dependencies": {
     "koa": "^2.6.2",
+    "koa-bodyparser": "^4.2.1",
+    "koa-route": "^3.2.0",
     "koa-static": "^5.0.0",
     "socket.io": "^2.2.0"
   }
