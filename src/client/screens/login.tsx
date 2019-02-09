@@ -34,11 +34,15 @@ export async function login() {
   render(
     container,
     <div className="container">
-      <form>
-        {colorInput}
-        {nameInput}
-      </form>
-      <button onclick={createGame}>Create Game</button>
+      <div className="top">
+        <div className="input-form">
+          {colorInput}
+          {nameInput}
+        </div>
+        <div>
+          <button onclick={createGame}>Create Game</button>
+        </div>
+      </div>
       {gameList}
     </div>
   );
@@ -60,8 +64,13 @@ export async function login() {
       gameList,
       ...games.map(({ id, name, players }) => (
         <li>
-          {name}, {players} player(s)
-          <button onclick={() => onConnect.resolve(id)}>Connect</button>
+          <div>
+            <span>{name}</span>
+            <span>{players} player(s)</span>
+            <div>
+              <button onclick={() => onConnect.resolve(id)}>Connect</button>
+            </div>
+          </div>
         </li>
       ))
     );

@@ -1,62 +1,70 @@
-body {
-    background-color: #7cbc8c;
-    margin: 0px;
-    padding: 0px;
-    min-height: 100vh;
+html, body {
+  background-color: #7cbc8c;
+  margin: 0px;
+  padding: 0px;
+  min-height: 100vh;
 }
 
 canvas {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    border: 0;
-    margin: 0;
-    border: 0;
-    max-width: 96vw;
-    max-height: 72vw;
-    width: 128vh;
-    height: 96vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border: 0;
+  margin: 0;
+  border: 0;
+  max-width: 96vw;
+  max-height: 72vw;
+  width: 128vh;
+  height: 96vh;
 }
 
 @media (orientation: portrait) {
-    canvas {
-        width: 96vw;
-        height: 72vw;
-        max-width: 128vh;
-        max-height: 96vh;
-    }
+  canvas {
+    width: 96vw;
+    height: 72vw;
+    max-width: 128vh;
+    max-height: 96vh;
+  }
 }
-
 
 .container {
-    position: absolute;
-    top: 30%;
-    left: 50%;
-    transform: translate(-50%, -30%);
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%,-35%);
+  width: 70%
 }
 
-.container > form {
-    display: flex;
-    width: 100%;
+.top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-form {
+  display: flex;
 }
 
 #color-picker {
-    width: 30px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 1.4rem;
 }
 
-.container > form > input {
-    margin: 0;
-    border: 0;
+input, button {
+  padding: 5px;
+  border: 0;
+  margin: 0;
+  background: white;
 }
-
-input,
 button {
-    padding: 0px;
+  border-radius: 5px;
 }
 
-.container > div {
-    text-align: center;
-    padding-top: 15px;
+li > div {
+  display: flex;
+  justify-content: space-between
 }
