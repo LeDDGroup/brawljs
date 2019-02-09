@@ -11,6 +11,7 @@ export async function login(): Promise<{ name: string; color: string }> {
   const nameRef: JSX.Reference<"input"> = {};
   const colorRef: JSX.Reference<"input"> = {};
   const randomColor = Math.floor(MAX_COLOR * Math.random()).toString(16);
+  const randomName = "newbie";
   container.appendChild(
     <div className="container">
       <form>
@@ -24,8 +25,7 @@ export async function login(): Promise<{ name: string; color: string }> {
           id="name-picker"
           ref={nameRef}
           type="text"
-          placeholder="name"
-          value="newbie"
+          placeholder={randomName}
         />
       </form>
       <div>
@@ -38,7 +38,7 @@ export async function login(): Promise<{ name: string; color: string }> {
     removeChildren(container);
     throw new Error("Couldn't get refernece of inputs");
   }
-  const name = nameRef.value.value;
+  const name = nameRef.value.value || randomName;
   const color = colorRef.value.value;
   removeChildren(container);
   return { name, color };
