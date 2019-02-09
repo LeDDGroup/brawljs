@@ -1,32 +1,26 @@
 import { createElement } from "tsx-create-html-element";
-import { removeChildren } from "./remove-children";
 import defer from "p-defer";
+import { render } from "./render";
 
 const MAX_COLOR = 255 * 255 * 255;
 
 export async function login(): Promise<{ name: string; color: string }> {
   const container = document.getElementById("app");
-  removeChildren(container);
   const onClick = defer();
-  const nameRef: JSX.Reference<"input"> = {};
-  const colorRef: JSX.Reference<"input"> = {};
   const randomColor = Math.floor(MAX_COLOR * Math.random()).toString(16);
   const randomName = "newbie";
-  container.appendChild(
+  const colorInput = (
+    <input id="color-picker" type="color" value={`#${randomColor}`} />
+  ) as HTMLInputElement;
+  const nameInput = (
+    <input id="name-picker" type="text" placeholder={randomName} />
+  ) as HTMLInputElement;
+  render(
+    container,
     <div className="container">
       <form>
-        <input
-          id="color-picker"
-          ref={colorRef}
-          type="color"
-          value={`#${randomColor}`}
-        />
-        <input
-          id="name-picker"
-          ref={nameRef}
-          type="text"
-          placeholder={randomName}
-        />
+        {colorInput}
+        {nameInput}
       </form>
       <div>
         <button onclick={onClick.resolve}>Go</button>
@@ -34,12 +28,7 @@ export async function login(): Promise<{ name: string; color: string }> {
     </div>
   );
   await onClick.promise;
-  if (!(nameRef.value && colorRef.value)) {
-    removeChildren(container);
-    throw new Error("Couldn't get refernece of inputs");
-  }
-  const name = nameRef.value.value || randomName;
-  const color = colorRef.value.value;
-  removeChildren(container);
+  const name = nameInput.value || randomName;
+  const color = colorInput.value;
   return { name, color };
 }

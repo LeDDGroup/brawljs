@@ -1,10 +1,10 @@
 import io from "socket.io-client";
 import { Controller } from "../controller";
-import { removeChildren } from "./remove-children";
 import { createElement } from "tsx-create-html-element";
 import defer from "p-defer";
 import { ServerMessages } from "../../core/messages";
 import { Point } from "../../core/point";
+import { render } from "./render";
 
 export const CANVAS_SIZE = new Point({
   x: 640,
@@ -13,10 +13,9 @@ export const CANVAS_SIZE = new Point({
 
 export async function play(info: { name: string; color: string }) {
   const container = document.getElementById("app");
-  removeChildren(container);
   const canvasRef: JSX.Reference<"canvas"> = {};
 
-  container.appendChild(<canvas ref={canvasRef} />);
+  render(container, <canvas ref={canvasRef} />);
 
   if (canvasRef.value === undefined) {
     throw new Error("Couldn't get canvas reference");
