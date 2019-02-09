@@ -2,27 +2,22 @@ import Koa = require("koa");
 import koaStatic = require("koa-static");
 import { resolve } from "path";
 import { createServer, Server as HttpServer } from "http";
-import IO, { Socket, Server as SocketServer } from "socket.io";
-import { Game } from "./game";
-import {
-  MessageHandlerDispatcher,
-  MessageDispatcher,
-  ServerMessages,
-  ClientMessages
-} from "../core/messages";
+import IO, { Server as SocketServer } from "socket.io";
+import { Controller } from "./controller";
 
 class Server {
   app: Koa;
   server: HttpServer;
   io: SocketServer;
-  game: Game = new Game();
+  controller: Controller;
   constructor(public port: string) {
     this.app = new Koa();
     this.server = createServer(this.app.callback());
     this.io = IO(this.server);
+    this.controller = new Controller(this.io.sockets);
   }
   async setup() {
-    this.io.sockets.on("connection", this.onConnection.bind(this));
+    this.controller.setup();
     if (process.env.NODE_ENV === "development") {
       this.app.use(await createWebpackMiddleware());
     } else {
@@ -30,31 +25,13 @@ class Server {
     }
   }
   async start() {
-    setInterval(() => {
-      this.game.update();
-      this.io.sockets.emit("sync", this.game.getState());
-    }, 1000 / 60);
+    this.controller.start();
     return new Promise((s, _) => {
       this.server.listen(this.port, () => {
         s();
       });
     });
   }
-  private onConnection = (socket: Socket) => {
-    // TODO validate input
-    socket.emit("map", this.game.getMap());
-    socket.on("disconnect", () => {
-      this.game.removePlayer(socket.id);
-    });
-    socket.on("newPlayer", data => {
-      this.game.addPlayer(socket.id, data);
-    });
-    socket.on("update", async data => {
-      if (this.game.players[socket.id]) {
-        this.game.syncPlayer(socket.id, data);
-      }
-    });
-  };
 }
 
 (async () => {
@@ -79,16 +56,4 @@ export async function createWebpackMiddleware() {
     },
     config: webpackConfig
   });
-}
-
-declare global {
-  namespace SocketIO {
-    interface Socket {
-      on: MessageHandlerDispatcher<ClientMessages & { disconnect: {} }>;
-      emit: MessageDispatcher<ServerMessages>;
-    }
-    interface Namespace {
-      emit: MessageDispatcher<ServerMessages>;
-    }
-  }
 }
