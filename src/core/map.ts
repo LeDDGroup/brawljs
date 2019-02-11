@@ -13,8 +13,8 @@ export class Map {
   constructor(terrain: Block[][]) {
     this.terrain = terrain;
     this.size = {
-      x: TERRAIN[0].length,
-      y: TERRAIN.length
+      x: terrain[0].length,
+      y: terrain.length
     };
     this.playerPositions = [];
     this.terrain.forEach((row, y) =>
@@ -27,22 +27,7 @@ export class Map {
   }
 }
 
-export const TERRAIN = getTerrainFromString(`
-111111111111
-1p00000000p1
-101110011101
-100000000001
-100111111001
-100010000001
-100000010001
-100111111001
-100000000001
-101110011101
-1p00000000p1
-111111111111
-`);
-
-function getTerrainFromString(map: string) {
+export function getTerrainFromString(map: string) {
   return map
     .trim()
     .split("\n")

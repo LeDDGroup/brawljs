@@ -6,6 +6,7 @@ import IO, { Server as SocketServer } from "socket.io";
 import { Controller } from "./controller";
 import bodyParser from "koa-bodyparser";
 import route from "koa-route";
+import { Block, Map, getTerrainFromString } from "../core/map";
 
 class Server {
   app: Koa;
@@ -19,9 +20,10 @@ class Server {
     this.io = IO(this.server);
     this.games = {};
   }
-  createGame(name: string) {
+  createGame(name: string, terrain: Block[][]) {
     const controller = new Controller(
-      this.io.of((++this.gameCounter).toString())
+      this.io.of((++this.gameCounter).toString()),
+      new Map(terrain)
     );
     this.games[controller.id] = { controller, name };
     controller.onEnd = () => {
@@ -55,8 +57,8 @@ class Server {
     );
     this.app.use(
       route.post("/games", ctx => {
-        const name = ctx.request.body.name;
-        const newGameId = this.createGame(name);
+        const { name, terrain } = ctx.request.body;
+        const newGameId = this.createGame(name, getTerrainFromString(terrain));
         ctx.body = { id: newGameId };
       })
     );

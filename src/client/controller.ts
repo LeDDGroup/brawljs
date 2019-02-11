@@ -7,12 +7,12 @@ import {
   ClientMessages,
   ServerMessages
 } from "../core/messages";
-import { TERRAIN, Map, Block } from "../core/map";
+import { Map, Block } from "../core/map";
 
 export const BLOCK_SIZE = 48;
 
 export class Controller {
-  game = new Game(new Map(TERRAIN));
+  game: Game;
   messages = new Queue<ClientMessages["update"]>();
   playerInput = new Player({
     keybindings: { left: "a", right: "d", up: "w", down: "s" },
@@ -23,11 +23,15 @@ export class Controller {
     return this.game.players[this.id];
   }
   constructor(
+    // TODO use option object instead
     public context: CanvasRenderingContext2D,
     public socket: ExtendedSocket,
     public info: { name: string; color: string },
-    public canvas: HTMLCanvasElement
-  ) {}
+    public canvas: HTMLCanvasElement,
+    terrain: Block[][]
+  ) {
+    this.game = new Game(new Map(terrain));
+  }
   async setup() {
     this.playerInput.setup();
 
@@ -106,7 +110,7 @@ export class Controller {
     this.context.save();
     for (let y = 0; y < this.game.map.size.y; y++) {
       for (let x = 0; x < this.game.map.size.x; x++) {
-        if (TERRAIN[y][x] === Block.Full)
+        if (this.game.map.terrain[y][x] === Block.Full)
           this.context.fillRect(
             x * BLOCK_SIZE,
             y * BLOCK_SIZE,

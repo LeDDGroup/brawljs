@@ -36,9 +36,16 @@ export async function play(info: {
   socket.connect();
   socket.on("map", onMap.resolve);
   await onConnect.promise;
+  const { terrain } = await onMap.promise;
   canvasRef.value.width = CANVAS_SIZE.x;
   canvasRef.value.height = CANVAS_SIZE.y;
-  const controller = new Controller(context, socket, info, canvasRef.value);
+  const controller = new Controller(
+    context,
+    socket,
+    info,
+    canvasRef.value,
+    terrain
+  );
   controller.setup();
   controller.start();
 }

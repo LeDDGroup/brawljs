@@ -1,5 +1,6 @@
 import { IPoint } from "./point";
 import { Player, Shot } from "./game-base";
+import { Block } from "./map";
 
 export interface ClientMessages {
   newPlayer: { name: string; color: string };
@@ -13,7 +14,7 @@ export interface ClientMessages {
 
 export interface ServerMessages {
   map: {
-    size: IPoint;
+    terrain: Block[][];
   };
   sync: {
     remainingTime: number;

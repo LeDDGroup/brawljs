@@ -6,14 +6,16 @@ import {
   MessageDispatcher,
   ServerMessages
 } from "../core/messages";
-import { Map, TERRAIN } from "../core/map";
+import { Map } from "../core/map";
 
 export class Controller {
-  game: Game = new Game(new Map(TERRAIN));
+  game: Game;
   updateInterval: NodeJS.Timeout | null = null;
   endgameTimeout: NodeJS.Timeout | null = null;
   time: number = 0;
-  constructor(public io: Namespace) {}
+  constructor(public io: Namespace, map: Map) {
+    this.game = new Game(map);
+  }
   get id() {
     return this.io.name;
   }

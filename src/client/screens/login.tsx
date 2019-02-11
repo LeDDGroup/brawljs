@@ -4,6 +4,21 @@ import { render } from "./render";
 
 const MAX_COLOR = 255 * 255 * 255;
 
+const TERRAIN = `
+111111111111
+1p00000000p1
+101110011101
+100000000001
+100111111001
+100010000001
+100000010001
+100111111001
+100000000001
+101110011101
+1p00000000p1
+111111111111
+`;
+
 export async function login() {
   const container = document.getElementById("app");
   const onConnect = defer<string>(); // choice === 0 create game
@@ -53,7 +68,8 @@ export async function login() {
   }
   async function createGame() {
     const result = await fetchPost("/games", {
-      name: `${nameInput.value || randomName}'s Game`
+      name: `${nameInput.value || randomName}'s Game`,
+      terrain: TERRAIN
     });
     const { id } = await result.json();
     onConnect.resolve(id);
