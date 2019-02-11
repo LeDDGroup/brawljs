@@ -100,6 +100,7 @@ export class Controller {
     this.context.resetTransform();
     this.drawRespawnCooldown();
     this.drawTimer();
+    this.drawScore();
   }
   drawMap() {
     this.context.save();
@@ -180,6 +181,15 @@ export class Controller {
     this.context.textBaseline = "top";
     this.context.font = "2rem sans-serif";
     this.context.fillText(Math.floor(this.remainingTime).toString(), 0, 0);
+    this.context.restore();
+  }
+  drawScore() {
+    this.context.save();
+    this.context.textAlign = "right";
+    this.context.fillStyle = "red";
+    this.context.textBaseline = "top";
+    this.context.font = "2rem sans-serif";
+    this.context.fillText(Math.floor(this.player.score).toString(), this.canvas.width, 0);
     this.context.restore();
   }
   get id() {

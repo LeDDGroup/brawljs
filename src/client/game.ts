@@ -18,6 +18,7 @@ export class Game extends GameBase {
       player.color = newData.color;
       player.name = newData.name;
       player.life = newData.life;
+      player.score = newData.score;
       player.deadCooldown = newData.deadCooldown;
     }
     this.shots = data.shots.map(

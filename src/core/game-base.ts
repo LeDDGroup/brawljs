@@ -13,6 +13,7 @@ const DEAD_COOLDOWN = 180;
 const SHOT_DAMAGE = 50;
 
 export class Player extends Circle {
+  score = 0;
   life: number = START_LIFE;
   lastMessage = "";
   name: string = "";
@@ -29,11 +30,11 @@ export class Player extends Circle {
 }
 
 export class Shot extends Circle {
-  playerId: Player["id"];
+  playerId: string;
   life = 30;
   position: Point;
   speed: Point;
-  constructor(position: IPoint, speed: IPoint, playerId: Player["id"]) {
+  constructor(position: IPoint, speed: IPoint, playerId: string) {
     super(SHOT_SIZE);
     this.playerId = playerId;
     this.position = new Point(position);
@@ -89,6 +90,7 @@ export class GameBase {
           shot.life = 0;
           if (player.life <= 0) {
             player.deadCooldown = DEAD_COOLDOWN;
+            this.players[shot.playerId].score++;
           }
         }
       }
