@@ -1,12 +1,33 @@
-import { Point, IPoint } from "./point";
+import { IPoint } from "./point";
 
-export const BLOCK_EMPTY = 0;
-export const BLOCK_FULL = 1;
-export const BLOCK_PLAYER_SPAWN = 2;
+export enum Block {
+  Empty,
+  Full,
+  Player
+}
 
-export const PLAYER_SPAWN_POINTS: IPoint[] = [];
+export class Map {
+  terrain: Block[][];
+  size: IPoint;
+  playerPositions: IPoint[];
+  constructor(terrain: Block[][]) {
+    this.terrain = terrain;
+    this.size = {
+      x: TERRAIN[0].length,
+      y: TERRAIN.length
+    };
+    this.playerPositions = [];
+    this.terrain.forEach((row, y) =>
+      row.forEach((block, x) => {
+        if (block === Block.Player) {
+          this.playerPositions.push({ x, y });
+        }
+      })
+    );
+  }
+}
 
-export const MAP = getMapFromString(`
+export const TERRAIN = getTerrainFromString(`
 111111111111
 1p00000000p1
 101110011101
@@ -21,24 +42,19 @@ export const MAP = getMapFromString(`
 111111111111
 `);
 
-export const WORLD_SIZE = new Point({
-  x: MAP[0].length,
-  y: MAP.length
-});
-
-function getMapFromString(map: string) {
+function getTerrainFromString(map: string) {
   return map
     .trim()
     .split("\n")
-    .map((el, y) =>
-         el
-         .split("")
-         .map((s, x) =>
-              s === "0"
-              ? BLOCK_EMPTY
-              : s === "p"
-              ? (PLAYER_SPAWN_POINTS.push({ y, x }), BLOCK_PLAYER_SPAWN)
-              : BLOCK_FULL
-             )
-        );
+    .map(row =>
+      row
+        .split("")
+        .map(block =>
+          block === "0"
+            ? Block.Empty
+            : block === "p"
+            ? Block.Player
+            : Block.Full
+        )
+    );
 }

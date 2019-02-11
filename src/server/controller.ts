@@ -6,9 +6,10 @@ import {
   MessageDispatcher,
   ServerMessages
 } from "../core/messages";
+import { Map, TERRAIN } from "../core/map";
 
 export class Controller {
-  game: Game = new Game();
+  game: Game = new Game(new Map(TERRAIN));
   updateInterval: NodeJS.Timeout | null = null;
   endgameTimeout: NodeJS.Timeout | null = null;
   time: number = 0;

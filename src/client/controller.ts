@@ -7,12 +7,12 @@ import {
   ClientMessages,
   ServerMessages
 } from "../core/messages";
-import { MAP, BLOCK_FULL, WORLD_SIZE } from "../core/map";
+import { TERRAIN, Map, Block } from "../core/map";
 
 export const BLOCK_SIZE = 48;
 
 export class Controller {
-  game = new Game();
+  game = new Game(new Map(TERRAIN));
   messages = new Queue<ClientMessages["update"]>();
   playerInput = new Player({
     keybindings: { left: "a", right: "d", up: "w", down: "s" },
@@ -104,9 +104,9 @@ export class Controller {
   }
   drawMap() {
     this.context.save();
-    for (let y = 0; y < WORLD_SIZE.y; y++) {
-      for (let x = 0; x < WORLD_SIZE.x; x++) {
-        if (MAP[y][x] === BLOCK_FULL)
+    for (let y = 0; y < this.game.map.size.y; y++) {
+      for (let x = 0; x < this.game.map.size.x; x++) {
+        if (TERRAIN[y][x] === Block.Full)
           this.context.fillRect(
             x * BLOCK_SIZE,
             y * BLOCK_SIZE,
@@ -189,7 +189,11 @@ export class Controller {
     this.context.fillStyle = "red";
     this.context.textBaseline = "top";
     this.context.font = "2rem sans-serif";
-    this.context.fillText(Math.floor(this.player.score).toString(), this.canvas.width, 0);
+    this.context.fillText(
+      Math.floor(this.player.score).toString(),
+      this.canvas.width,
+      0
+    );
     this.context.restore();
   }
   get id() {

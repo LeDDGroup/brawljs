@@ -1,7 +1,7 @@
 import { Point, IPoint } from "./point";
 import { ClientMessages } from "./messages";
 import { Circle, Rect } from "./shape";
-import { WORLD_SIZE, BLOCK_FULL, MAP, PLAYER_SPAWN_POINTS } from "./map";
+import { Map, Block } from "./map";
 
 const START_LIFE = 100;
 const SHOOT_COOLDOWN = 60;
@@ -51,7 +51,7 @@ export class Shot extends Circle {
 export class GameBase {
   players: Record<keyof any, Player> = {};
   shots: Shot[] = [];
-  size = new Point(WORLD_SIZE.copy());
+  constructor(public map: Map) {}
   update() {
     this.updatePlayers();
     this.updateShots();
@@ -116,7 +116,7 @@ export class GameBase {
     const endx = Math.ceil(rect.position.x + rect.size.x);
     for (let y = starty; y < endy; y++) {
       for (let x = startx; x < endx; x++) {
-        if (MAP[y][x] === BLOCK_FULL) {
+        if (this.map.terrain[y][x] === Block.Full) {
           return true;
         }
       }
@@ -135,7 +135,7 @@ export class GameBase {
     }
   }
   getRandomPlayerPosition(): IPoint {
-    return new Point(getRandom(PLAYER_SPAWN_POINTS)).sum(0.5);
+    return new Point(getRandom(this.map.playerPositions)).sum(0.5);
   }
 }
 
