@@ -18,7 +18,7 @@ export class Game extends GameBase {
       size: WORLD_SIZE
     };
   }
-  getState(): ServerMessages["sync"] {
+  getState() {
     return { players: this.players, shots: this.shots };
   }
 }

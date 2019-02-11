@@ -9,7 +9,9 @@ import {
 
 export class Controller {
   game: Game = new Game();
-  interval: NodeJS.Timeout | null = null;
+  updateInterval: NodeJS.Timeout | null = null;
+  endgameTimeout: NodeJS.Timeout | null = null;
+  time: number = 0;
   constructor(public io: Namespace) {}
   get id() {
     return this.io.name;
@@ -36,16 +38,34 @@ export class Controller {
     });
   };
   start() {
-    this.interval = setInterval(() => {
+    const timeToEnd = 2 * 60 * 1000; // 2 minutes TODO remove constant from here
+    this.time = Date.now() + timeToEnd;
+    this.endgameTimeout = setTimeout(() => {
+      this.onEnd();
+    }, timeToEnd);
+    this.updateInterval = setInterval(() => {
       this.game.update();
-      this.io.emit("sync", this.game.getState());
+      this.io.emit("sync", {
+        remainingTime: this.getRemainingTime(),
+        ...this.game.getState()
+      });
     }, 1000 / 60);
   }
   stop() {
-    if (this.interval) {
-      clearInterval(this.interval);
+    if (this.updateInterval) {
+      clearInterval(this.updateInterval);
+    }
+    if (this.endgameTimeout) {
+      clearTimeout(this.endgameTimeout);
     }
   }
+  getRemainingTime() {
+    return (this.time - Date.now()) / 1000;
+  }
+  disconnect() {
+    this.io.removeAllListeners();
+  }
+  onEnd = () => {};
 }
 
 declare global {

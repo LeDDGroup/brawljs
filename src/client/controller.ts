@@ -18,6 +18,7 @@ export class Controller {
     keybindings: { left: "a", right: "d", up: "w", down: "s" },
     canvas: this.canvas
   });
+  remainingTime: number = 0;
   public get player() {
     return this.game.players[this.id];
   }
@@ -31,25 +32,29 @@ export class Controller {
     this.playerInput.setup();
 
     this.socket.on("sync", data => {
-      this.game.sync(data);
-      if (data.players[this.id]) {
-        if (!this.messages.empty()) {
-          const lastMessage = data.players[this.id].lastMessage;
-          if (lastMessage !== "")
-            while (
-              !this.messages.empty() &&
-              lastMessage >= this.messages.front.messageId
-            ) {
-              this.messages.drop();
-            }
-          this.messages.forEach(message => {
-            this.game.syncPlayer(this.id, message);
-            this.game.update();
-            return true;
-          });
-        }
-      }
+      this.onSync(data);
     });
+  }
+  onSync(data: ServerMessages["sync"]) {
+    this.remainingTime = data.remainingTime;
+    this.game.sync(data);
+    if (data.players[this.id]) {
+      if (!this.messages.empty()) {
+        const lastMessage = data.players[this.id].lastMessage;
+        if (lastMessage !== "")
+          while (
+            !this.messages.empty() &&
+            lastMessage >= this.messages.front.messageId
+          ) {
+            this.messages.drop();
+          }
+        this.messages.forEach(message => {
+          this.game.syncPlayer(this.id, message);
+          this.game.update();
+          return true;
+        });
+      }
+    }
   }
   start() {
     // game
@@ -94,6 +99,7 @@ export class Controller {
     this.drawShots();
     this.context.resetTransform();
     this.drawRespawnCooldown();
+    this.drawTimer();
   }
   drawMap() {
     this.context.save();
@@ -166,6 +172,15 @@ export class Controller {
       );
       this.context.restore();
     }
+  }
+  drawTimer() {
+    this.context.save();
+    this.context.textAlign = "left";
+    this.context.fillStyle = "red";
+    this.context.textBaseline = "top";
+    this.context.font = "2rem sans-serif";
+    this.context.fillText(Math.floor(this.remainingTime).toString(), 0, 0);
+    this.context.restore();
   }
   get id() {
     return this.socket.id;

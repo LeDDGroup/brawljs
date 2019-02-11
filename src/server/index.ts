@@ -24,6 +24,11 @@ class Server {
       this.io.of((++this.gameCounter).toString())
     );
     this.games[controller.id] = { controller, name };
+    controller.onEnd = () => {
+      controller.stop();
+      controller.disconnect();
+      delete this.games[controller.id];
+    };
     controller.setup();
     controller.start();
     return controller.id;

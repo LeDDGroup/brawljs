@@ -16,6 +16,7 @@ export interface ServerMessages {
     size: IPoint;
   };
   sync: {
+    remainingTime: number;
     players: Record<any, Player>;
     shots: Shot[];
   };
