@@ -8,6 +8,9 @@
     "dev": "NODE_ENV=development node-dev --require ts-node/register/transpile-only src/server/index.ts",
     "prebuild": "rm -rf dist",
     "prepare": "npm run build",
+    "check": "redrun check:*",
+    "check:server": "tsc --noEmit -p src/server",
+    "check:client": "tsc --noEmit -p src/client",
     "build": "redrun build:*",
     "build:server": "tsc -p src/server",
     "build:client": "webpack --config src/client/webpack.config.js --mode production --output-path dist/client"
