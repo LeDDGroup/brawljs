@@ -139,10 +139,11 @@ export class Controller {
       this.context.fill();
       this.context.fillStyle = "red";
       this.context.textAlign = "center";
+      this.context.textBaseline = "bottom";
       this.context.fillText(
         `${player.life.toString()} ${player.name}`,
         player.position.x * BLOCK_SIZE,
-        player.position.y * BLOCK_SIZE - 10
+        (player.position.y - player.radius) * BLOCK_SIZE
       );
       this.context.restore();
     }
