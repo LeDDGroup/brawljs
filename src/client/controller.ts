@@ -122,10 +122,10 @@ export class Controller {
     this.context.restore();
   }
   drawPlayers() {
+    this.context.save();
     for (const id in this.game.players) {
       const player = this.game.players[id];
       if (player.life <= 0) continue;
-      this.context.save();
       this.context.fillStyle = player.color;
       this.context.beginPath();
       this.context.arc(
@@ -145,8 +145,8 @@ export class Controller {
         player.position.x * BLOCK_SIZE,
         (player.position.y - player.radius) * BLOCK_SIZE
       );
-      this.context.restore();
     }
+    this.context.restore();
   }
   drawShots() {
     for (const shot of this.game.shots) {
