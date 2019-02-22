@@ -94,9 +94,13 @@ export class Controller {
   }
   draw() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.context.scale(
+          this.canvas.width / this.canvas.clientWidth,
+          this.canvas.height / this.canvas.clientHeight,
+      );
     this.context.translate(
-      -this.player.position.x * BLOCK_SIZE + this.canvas.width / 2,
-      -this.player.position.y * BLOCK_SIZE + this.canvas.height / 2
+      -this.player.position.x * BLOCK_SIZE + this.canvas.clientWidth / 2,
+      -this.player.position.y * BLOCK_SIZE + this.canvas.clientHeight / 2
     );
     this.drawMap();
     this.drawPlayers();

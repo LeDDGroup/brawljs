@@ -14,20 +14,22 @@ canvas {
   border: 0;
   margin: 0;
   border: 0;
-  max-width: 96vw;
-  max-height: 72vw;
-  width: 128vh;
-  height: 96vh;
+  /* max-width: 96vw; */
+  /* max-height: 72vw; */
+  /* width: 128vh; */
+  /* height: 96vh; */
+  width: 100%;
+  height: 100%;
 }
 
-@media (orientation: portrait) {
-  canvas {
-    width: 96vw;
-    height: 72vw;
-    max-width: 128vh;
-    max-height: 96vh;
-  }
-}
+/* @media (orientation: portrait) { */
+/*   canvas { */
+/*     width: 96vw; */
+/*     height: 72vw; */
+/*     max-width: 128vh; */
+/*     max-height: 96vh; */
+/*   } */
+/* } */
 
 .container {
   position: absolute;
