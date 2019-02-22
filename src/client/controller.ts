@@ -8,8 +8,23 @@ import {
   ServerMessages
 } from "../core/messages";
 import { Map, Block } from "../core/map";
+import { isArray } from "util";
+
+type Func<Args extends any[] = [], Ret = void> = (...args: Args) => Ret;
 
 export const BLOCK_SIZE = 48;
+
+function Enum<T extends keyof any>(): { [id in T]: id } {
+  return new Proxy<any>({} as T, {
+    get(_, name) {
+      return name;
+    }
+  });
+}
+
+type Transform = "translate" | "scale";
+
+const transform = Enum<Transform>();
 
 export class Controller {
   game: Game;
@@ -92,20 +107,38 @@ export class Controller {
     this.game.update();
     this.playerInput.resetInput();
   }
+  transform: Record<Transform, Func> = {
+    translate: () => {
+      this.context.translate(
+        this.canvas.clientWidth / 2 - this.player.position.x * BLOCK_SIZE,
+        this.canvas.clientHeight / 2 - this.player.position.y * BLOCK_SIZE
+      );
+    },
+    scale: () => {
+      this.context.scale(
+        this.canvas.width / this.canvas.clientWidth,
+        this.canvas.height / this.canvas.clientHeight
+      );
+    }
+  };
+  withTransform(transforms: Transform | Transform[], func: () => void) {
+    if (Array.isArray(transforms)) {
+      for (const transform of transforms) {
+        this.transform[transform]();
+      }
+    } else {
+      this.transform[transforms]();
+    }
+    func();
+    this.context.resetTransform();
+  }
   draw() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.context.scale(
-          this.canvas.width / this.canvas.clientWidth,
-          this.canvas.height / this.canvas.clientHeight,
-      );
-    this.context.translate(
-      -this.player.position.x * BLOCK_SIZE + this.canvas.clientWidth / 2,
-      -this.player.position.y * BLOCK_SIZE + this.canvas.clientHeight / 2
-    );
-    this.drawMap();
-    this.drawPlayers();
-    this.drawShots();
-    this.context.resetTransform();
+    this.withTransform([transform.scale, transform.translate], () => {
+      this.drawMap();
+      this.drawPlayers();
+      this.drawShots();
+    });
     this.drawRespawnCooldown();
     this.drawTimer();
     this.drawScore();
@@ -175,11 +208,13 @@ export class Controller {
       this.context.save();
       this.context.textAlign = "center";
       this.context.font = "2rem sans-serif";
-      this.context.fillText(
-        Math.ceil(playerCooldown / 60).toString(),
-        this.canvas.width / 2,
-        this.canvas.height / 2
-      );
+      this.withTransform(transform.scale, () => {
+        this.context.fillText(
+          Math.ceil(playerCooldown / 60).toString(),
+          this.canvas.width / 2,
+          this.canvas.height / 2
+        );
+      });
       this.context.restore();
     }
   }
@@ -189,7 +224,9 @@ export class Controller {
     this.context.fillStyle = "red";
     this.context.textBaseline = "top";
     this.context.font = "2rem sans-serif";
-    this.context.fillText(Math.floor(this.remainingTime).toString(), 0, 0);
+    this.withTransform(transform.scale, () => {
+      this.context.fillText(Math.floor(this.remainingTime).toString(), 0, 0);
+    });
     this.context.restore();
   }
   drawScore() {
@@ -198,11 +235,13 @@ export class Controller {
     this.context.fillStyle = "red";
     this.context.textBaseline = "top";
     this.context.font = "2rem sans-serif";
-    this.context.fillText(
-      Math.floor(this.player.score).toString(),
-      this.canvas.width,
-      0
-    );
+    this.withTransform(transform.scale, () => {
+      this.context.fillText(
+        Math.floor(this.player.score).toString(),
+        this.canvas.clientWidth,
+        0
+      );
+    });
     this.context.restore();
   }
   get id() {
