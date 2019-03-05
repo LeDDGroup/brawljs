@@ -36,9 +36,11 @@ export async function play(info: {
   socket.connect();
   socket.on("map", onMap.resolve);
   await onConnect.promise;
+  const id = socket.id;
   const { terrain } = await onMap.promise;
   canvasRef.value.width = CANVAS_SIZE.x;
   canvasRef.value.height = CANVAS_SIZE.y;
+  const onEnd = defer<any>(); // TODO don't use any
   const controller = new Controller(
     context,
     socket,
@@ -48,4 +50,37 @@ export async function play(info: {
   );
   controller.setup();
   controller.start();
+  controller.onEnd = onEnd.resolve;
+  const results = await onEnd.promise;
+  const onNext = defer();
+  render(
+    container,
+    <MatchResults results={results} playerId={id} onNext={onNext.resolve} />
+  );
+  await onNext.promise;
+}
+
+function MatchResults(props: {
+  playerId: string;
+  results: { score: number; name: string; id: string }[];
+  onNext: () => void;
+}) {
+  return (
+    <div className="container">
+      <ul>
+        {props.results.map(({ score, id, name }) => (
+          <li>
+            {id === props.playerId ? (
+              <b>
+                {score} - {name}
+              </b>
+            ) : (
+              `${score} - ${name}`
+            )}
+          </li>
+        ))}
+      </ul>
+      <button onclick={props.onNext}>Continue</button>
+    </div>
+  );
 }

@@ -8,7 +8,6 @@ import {
   ServerMessages
 } from "../core/messages";
 import { Map, Block } from "../core/map";
-import { isArray } from "util";
 
 type Func<Args extends any[] = [], Ret = void> = (...args: Args) => Ret;
 
@@ -34,6 +33,7 @@ export class Controller {
     canvas: this.canvas
   });
   remainingTime: number = 0;
+  interval: number = 0;
   public get player() {
     return this.game.players[this.id];
   }
@@ -74,6 +74,16 @@ export class Controller {
         });
       }
     }
+    if (this.remainingTime <= 0) {
+      this.stop();
+      this.onEnd(
+        Object.keys(this.game.players).map(id => ({
+          id,
+          name: this.game.players[id].name,
+          score: this.game.players[id].score
+        }))
+      );
+    }
   }
   start() {
     // game
@@ -82,10 +92,13 @@ export class Controller {
       color: this.info.color
     });
 
-    setInterval(() => {
+    this.interval = window.setInterval(() => {
       this.update();
       this.draw();
     }, 1000 / 60);
+  }
+  stop() {
+    window.clearInterval(this.interval);
   }
   update() {
     const baseUpdate: ClientMessages["update"] = {
@@ -247,6 +260,7 @@ export class Controller {
   get id() {
     return this.socket.id;
   }
+  onEnd = (_results: { score: number; name: string; id: string }[]) => {};
 }
 
 interface ExtendedSocket extends SocketIOClient.Socket {

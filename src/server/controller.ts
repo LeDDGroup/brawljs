@@ -45,7 +45,7 @@ export class Controller {
     this.time = Date.now() + timeToEnd;
     this.endgameTimeout = setTimeout(() => {
       this.onEnd();
-    }, timeToEnd);
+    }, timeToEnd + 100); // HACK + 100 delay to send timeToEnd = 0 status allowing clients to finish
     this.updateInterval = setInterval(() => {
       this.game.update();
       this.io.emit("sync", {
