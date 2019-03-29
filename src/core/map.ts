@@ -1,29 +1,34 @@
-import { IPoint } from "./point";
+import { Point } from "./point";
+import { Data } from "./types";
 
 export enum Block {
   Empty,
   Full,
-  Player
+  Player,
+  Cover
 }
 
 export class GameMap {
   terrain: Block[][];
-  size: IPoint;
-  playerPositions: IPoint[];
+  size: Point;
+  playerPositions: Point[];
   constructor(terrain: Block[][]) {
     this.terrain = terrain;
-    this.size = {
+    this.size = new Point({
       x: terrain[0].length,
       y: terrain.length
-    };
+    });
     this.playerPositions = [];
     this.terrain.forEach((row, y) =>
       row.forEach((block, x) => {
         if (block === Block.Player) {
-          this.playerPositions.push({ x, y });
+          this.playerPositions.push(new Point({ x, y }));
         }
       })
     );
+  }
+  blockAt(point: Data<Point>) {
+    return this.terrain[point.y][point.x];
   }
 }
 
@@ -39,6 +44,8 @@ export function getTerrainFromString(map: string) {
             ? Block.Empty
             : block === "p"
             ? Block.Player
+            : block === "#"
+            ? Block.Cover
             : Block.Full
         )
     );

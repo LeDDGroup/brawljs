@@ -20,7 +20,7 @@ const CHARACTER_DATA = {
     bulletSize: 0.05,
     bulletSpeed: 0.1,
     bulletTime: 15,
-    attackRange: Math.PI * 60 / 180,
+    attackRange: (Math.PI * 40) / 180,
     bulletAmount: 8
   },
   sharpshooter: {
@@ -111,6 +111,7 @@ export class Game {
       life: number;
       score: number;
       deadCooldown: number;
+      attackCooldown: number;
     }
   ) {
     const player = this.getPlayer(id);
@@ -118,6 +119,7 @@ export class Game {
     player.life = options.life;
     player.score = options.score;
     player.deadCooldown = options.deadCooldown;
+    player.attackCooldown = options.attackCooldown;
   }
   removePlayer(id: string) {
     this.players.delete(id);

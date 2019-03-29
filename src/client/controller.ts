@@ -185,13 +185,16 @@ export class Controller {
     this.context.save();
     for (let y = 0; y < this.game.map.size.y; y++) {
       for (let x = 0; x < this.game.map.size.x; x++) {
-        if (this.game.map.terrain[y][x] === Block.Full)
+        const block = this.game.map.terrain[y][x];
+        if (block === Block.Full || block === Block.Cover) {
+          this.context.fillStyle = block === Block.Full ? "#000000" : "#E4DC4C";
           this.context.fillRect(
             x * BLOCK_SIZE,
             y * BLOCK_SIZE,
             BLOCK_SIZE + 1,
             BLOCK_SIZE + 1
           );
+        }
       }
     }
     this.context.restore();
@@ -200,6 +203,12 @@ export class Controller {
     this.context.save();
     this.game.players.forEach(player => {
       if (player.life <= 0) return;
+      if (
+        // If is under cover and hasn't attack long ago hide it
+        this.game.map.blockAt(player.position.copy().floor()) === Block.Cover &&
+        player.attackCooldown === 0
+      )
+        return;
       this.context.fillStyle = player.color;
       this.context.beginPath();
       this.context.arc(
