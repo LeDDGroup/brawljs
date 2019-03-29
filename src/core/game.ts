@@ -3,18 +3,35 @@ import { Circle, Rect } from "./shape";
 import { GameMap, Block } from "./map";
 import { Data } from "./types";
 
-const START_LIFE = 100;
-const SHOOT_COOLDOWN = 60;
-const PLAYER_SPEED = 0.03;
 const PLAYER_SIZE = 0.3;
 const SHOT_SIZE = 0.15;
 const SHOT_SPEED = 0.1;
 const DEAD_COOLDOWN = 180;
-const SHOT_DAMAGE = 50;
+
+export enum PlayerType {
+  sharpshooter = "sharpshooter"
+}
+
+interface Character {
+  hp: number;
+  speed: number;
+  cooldown: number;
+  damage: number;
+}
+
+const CharacterData: Record<PlayerType, Character> = {
+  sharpshooter: {
+    hp: 100,
+    speed: 0.03,
+    cooldown: 180,
+    damage: 50
+  }
+};
 
 export class Player extends Circle {
   id: string = "";
   score = 0;
+  type: PlayerType = PlayerType.sharpshooter;
   life: number = 0;
   lastMessage = "";
   name: string = "";
@@ -24,6 +41,19 @@ export class Player extends Circle {
   shootDirection: Point = new Point();
   shootCooldown: number = 0;
   deadCooldown: number = 0;
+  // helpers
+  get maxHp() {
+    return CharacterData[this.type].hp;
+  }
+  get maxSpeed() {
+    return CharacterData[this.type].speed;
+  }
+  get damage() {
+    return CharacterData[this.type].damage;
+  }
+  get attackCooldown() {
+    return CharacterData[this.type].cooldown;
+  }
 }
 
 export class Shot extends Circle {
@@ -31,7 +61,7 @@ export class Shot extends Circle {
   life = 30;
   position: Point;
   speed: Point;
-  constructor(position: Point, speed: Point, playerId: string) {
+  constructor(position: Data<Point>, speed: Data<Point>, playerId: string) {
     super(SHOT_SIZE);
     this.playerId = playerId;
     this.position = new Point(position);
@@ -56,19 +86,25 @@ export class Game {
     }
     return player;
   }
-  addPlayer(id: string, options: { color: string; name: string }) {
+  addPlayer(
+    id: string,
+    options: { type: PlayerType; color: string; name: string }
+  ) {
     const player = new Player();
     player.id = id;
-    player.life = START_LIFE;
+    player.type = options.type;
     player.color = options.color;
     player.name = options.name;
     player.radius = PLAYER_SIZE;
     this.players.set(id, player);
-    this.resetPlayerPosition(id);
+    this.resetPlayer(id);
   }
-  addShot(player: Player) {
-    const speed = new Point(player.shootDirection).top(SHOT_SPEED);
-    this.shots.push(new Shot(player.position, speed, player.id));
+  addShot(
+    playerId: string,
+    options: { direction: Data<Point>; position: Data<Point> }
+  ) {
+    const speed = new Point(options.direction).top(SHOT_SPEED);
+    this.shots.push(new Shot(options.position, speed, playerId));
   }
   setPlayer(
     id: string,
@@ -88,8 +124,10 @@ export class Game {
   removePlayer(id: string) {
     this.players.delete(id);
   }
-  resetPlayerPosition(id: string) {
-    this.players.get(id)!.position.assign(this.getRandomPlayerPosition());
+  resetPlayer(id: string) {
+    const player = this.getPlayer(id);
+    player.life = player.maxHp;
+    player.position.assign(this.getRandomPlayerPosition());
   }
   update() {
     this.updatePlayers();
@@ -104,19 +142,28 @@ export class Game {
         player.deadCooldown--;
       }
       if (player.life <= 0 && player.deadCooldown <= 0) {
-        player.life = START_LIFE;
-        player.position.assign(this.getRandomPlayerPosition());
+        this.resetPlayer(player.id);
       }
       if (player.life > 0) {
         player.position.sum(
           this.getSpeedAfterCollision(
             player.toRect(),
-            player.speed.top(PLAYER_SPEED)
+            player.speed.top(player.maxSpeed)
           )
         );
         if (player.shoot && player.shootCooldown <= 0) {
-          player.shootCooldown = SHOOT_COOLDOWN;
-          this.addShot(player);
+          player.shootCooldown = player.attackCooldown;
+          switch (player.type) {
+            case PlayerType.sharpshooter:
+              this.addShot(player.id, {
+                position: player.position,
+                direction: player.shootDirection
+              });
+              break;
+            default:
+              // TODO maybe shouldn't throw error for production
+              throw new Error(`${player.type} player type not recognized`);
+          }
         }
       }
     });
@@ -130,7 +177,7 @@ export class Game {
           shot.playerId !== player.id &&
           player.collides(shot)
         ) {
-          player.life -= SHOT_DAMAGE;
+          player.life -= this.getPlayer(shot.playerId).damage;
           shot.life = 0;
           if (player.life <= 0) {
             player.deadCooldown = DEAD_COOLDOWN;

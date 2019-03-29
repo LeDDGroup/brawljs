@@ -65,6 +65,7 @@ export class Controller {
       const newData = data.players[id];
       if (!this.game.players.has(id)) {
         this.game.addPlayer(newData.id, {
+          type: newData.type,
           color: newData.color,
           name: newData.name
         });
