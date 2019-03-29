@@ -5,6 +5,7 @@ import defer from "p-defer";
 import { ServerMessages } from "../../core/messages";
 import { Point } from "../../core/point";
 import { render } from "./render";
+import { PlayerType } from "../../core/game";
 
 export const CANVAS_SIZE = new Point({
   x: 640,
@@ -13,6 +14,7 @@ export const CANVAS_SIZE = new Point({
 
 export async function play(info: {
   name: string;
+  type: PlayerType;
   color: string;
   gameId: string;
 }) {

@@ -1,5 +1,5 @@
 import { Player } from "./utils/player";
-import { Game } from "../core/game";
+import { Game, PlayerType } from "../core/game";
 import { Queue } from "./utils/queue";
 import {
   MessageHandlerDispatcher,
@@ -41,7 +41,7 @@ export class Controller {
     // TODO use option object instead
     public context: CanvasRenderingContext2D,
     public socket: ExtendedSocket,
-    public info: { name: string; color: string },
+    public info: { type: PlayerType; name: string; color: string },
     public canvas: HTMLCanvasElement,
     terrain: Block[][]
   ) {
@@ -111,6 +111,7 @@ export class Controller {
   start() {
     // game
     this.socket.emit("newPlayer", {
+      type: this.info.type,
       name: this.info.name,
       color: this.info.color
     });

@@ -1,4 +1,4 @@
-import { Point } from "./point";
+import { Point, pointFromAngle } from "./point";
 import { Circle, Rect } from "./shape";
 import { GameMap, Block } from "./map";
 import { Data } from "./types";
@@ -7,10 +7,22 @@ const PLAYER_SIZE = 0.3;
 const DEAD_COOLDOWN = 180;
 
 export enum PlayerType {
+  mele = "mele",
   sharpshooter = "sharpshooter"
 }
 
 const CHARACTER_DATA = {
+  mele: {
+    hp: 150,
+    speed: 0.04,
+    cooldown: 60,
+    damage: 20,
+    bulletSize: 0.05,
+    bulletSpeed: 0.1,
+    bulletTime: 15,
+    attackRange: Math.PI * 60 / 180,
+    bulletAmount: 8
+  },
   sharpshooter: {
     hp: 100,
     speed: 0.03,
@@ -18,7 +30,7 @@ const CHARACTER_DATA = {
     damage: 50,
     bulletSize: 0.15,
     bulletSpeed: 0.1,
-    bulletTime: 15
+    bulletTime: 30
   }
 };
 
@@ -147,6 +159,26 @@ export class Game {
                 position: player.position,
                 speed: player.attackDirection.top(player.base.bulletSpeed)
               });
+              break;
+            case PlayerType.mele:
+              const angleDelta =
+                CHARACTER_DATA[PlayerType.mele].attackRange /
+                CHARACTER_DATA[PlayerType.mele].bulletAmount;
+              for (
+                let i = 0,
+                  angle =
+                    player.attackDirection.getAngle() -
+                    CHARACTER_DATA[PlayerType.mele].attackRange / 2;
+                i < CHARACTER_DATA[PlayerType.mele].bulletAmount;
+                i++, angle += angleDelta
+              ) {
+                this.addBullet(player.id, {
+                  time: player.base.bulletTime,
+                  size: player.base.bulletSize,
+                  position: player.position,
+                  speed: pointFromAngle(angle, player.base.bulletSpeed)
+                });
+              }
               break;
             default:
               // TODO maybe shouldn't throw error for production

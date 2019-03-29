@@ -88,6 +88,13 @@ export class Point {
   }
 }
 
+export function pointFromAngle(angle: number, length: number = 1) {
+  return new Point({
+    x: roundToCero(Math.cos(angle) * length),
+    y: roundToCero(Math.sin(angle) * length)
+  });
+}
+
 function roundToCero(x: number) {
   // small number
   if (Math.abs(x) < 0.000015) return 0;

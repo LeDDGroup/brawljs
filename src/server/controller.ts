@@ -1,4 +1,4 @@
-import { Game, PlayerType } from "../core/game";
+import { Game } from "../core/game";
 import { Namespace, Socket } from "socket.io";
 import {
   MessageHandlerDispatcher,
@@ -38,7 +38,7 @@ export class Controller {
       this.game.removePlayer(socket.id);
     });
     socket.on("newPlayer", data => {
-      this.game.addPlayer(socket.id, { ...data, type: PlayerType.sharpshooter });
+      this.game.addPlayer(socket.id, data);
     });
     socket.on("update", async data => {
       // TODO validate data

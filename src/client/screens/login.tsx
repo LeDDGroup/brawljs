@@ -1,6 +1,7 @@
 import { createElement } from "tsx-create-html-element";
 import defer from "p-defer";
 import { render } from "./render";
+import { PlayerType } from "../../core/game";
 
 const MAX_COLOR = 255 * 255 * 255;
 
@@ -30,6 +31,12 @@ export async function login() {
   const nameInput = (
     <input id="name-picker" type="text" placeholder={randomName} />
   ) as HTMLInputElement;
+  const typeInput = (
+    <select>
+      <option>mele</option>
+      <option>sharpshooter</option>
+    </select>
+  ) as HTMLSelectElement;
   const gameList = <ul /> as HTMLUListElement;
   render(
     container,
@@ -38,6 +45,7 @@ export async function login() {
         <div className="input-form">
           {colorInput}
           {nameInput}
+          {typeInput}
         </div>
         <div>
           <button onclick={createGame}>Create Game</button>
@@ -49,8 +57,9 @@ export async function login() {
   await refreshGames();
   const gameId = await onConnect.promise;
   const name = nameInput.value || randomName;
+  const type = typeInput.value as PlayerType;
   const color = colorInput.value;
-  return { name, color, gameId };
+  return { type, name, color, gameId };
   // TODO handle errors
   // TODO refactor, put in interface as done with sockets
   async function refreshGames() {

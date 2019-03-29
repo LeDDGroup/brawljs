@@ -1,12 +1,12 @@
 import { Data } from "./types";
 import { Point } from "./point";
-import { Player, Bullet } from "./game";
+import { Player, Bullet, PlayerType } from "./game";
 import { Block } from "./map";
 
 type IPoint = Data<Point>;
 
 export interface ClientMessages {
-  newPlayer: { name: string; color: string };
+  newPlayer: { type: PlayerType; name: string; color: string };
   update: {
     messageId: string;
     speed: IPoint;
