@@ -1,12 +1,9 @@
-export interface IPoint {
-  x: number;
-  y: number;
-}
+import { Data } from "./types";
 
-export class Point implements IPoint {
+export class Point {
   public x: number;
   public y: number;
-  constructor(options: Partial<IPoint> = {}) {
+  constructor(options: Partial<Data<Point>> = {}) {
     const { x = 0, y = 0 } = options;
     this.x = x;
     this.y = y;
@@ -29,7 +26,7 @@ export class Point implements IPoint {
     this.y = Math.ceil(this.y);
     return this;
   }
-  public sum(point: Partial<IPoint> | number): Point {
+  public sum(point: Partial<Data<Point>> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -37,7 +34,7 @@ export class Point implements IPoint {
     this.y += point.y || 0;
     return this;
   }
-  public subtract(point: Partial<IPoint> | number): Point {
+  public subtract(point: Partial<Data<Point>> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -45,7 +42,7 @@ export class Point implements IPoint {
     this.y -= point.y || 0;
     return this;
   }
-  public multiply(point: Partial<IPoint> | number): Point {
+  public multiply(point: Partial<Data<Point>> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -53,7 +50,7 @@ export class Point implements IPoint {
     this.y *= point.y !== undefined ? point.y : 1;
     return this;
   }
-  public divide(point: Partial<IPoint> | number): Point {
+  public divide(point: Partial<Data<Point>> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -65,7 +62,7 @@ export class Point implements IPoint {
     this.multiply(-1);
     return this;
   }
-  public assign(point: Partial<IPoint>): Point {
+  public assign(point: Partial<Data<Point>>): Point {
     this.x = point.x !== undefined ? point.x : this.x;
     this.y = point.y !== undefined ? point.y : this.y;
     return this;

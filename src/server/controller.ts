@@ -1,4 +1,4 @@
-import { Game } from "./game";
+import { Game } from "../core/game";
 import { Namespace, Socket } from "socket.io";
 import {
   MessageHandlerDispatcher,
@@ -6,14 +6,20 @@ import {
   MessageDispatcher,
   ServerMessages
 } from "../core/messages";
-import { Map } from "../core/map";
+import { GameMap } from "../core/map";
+
+function mapToRecord<K extends keyof any, V>(map: Map<K, V>) {
+  const result: Record<K, V> = {} as any;
+  map.forEach((v, k) => (result[k] = v));
+  return result;
+}
 
 export class Controller {
   game: Game;
   updateInterval: NodeJS.Timeout | null = null;
   endgameTimeout: NodeJS.Timeout | null = null;
   time: number = 0;
-  constructor(public io: Namespace, map: Map) {
+  constructor(public io: Namespace, map: GameMap) {
     this.game = new Game(map);
   }
   get id() {
@@ -27,7 +33,7 @@ export class Controller {
   }
   private onConnection = (socket: Socket) => {
     // TODO validate input
-    socket.emit("map", this.game.getMap());
+    socket.emit("map", { terrain: this.game.map.terrain });
     socket.on("disconnect", () => {
       this.game.removePlayer(socket.id);
     });
@@ -35,8 +41,13 @@ export class Controller {
       this.game.addPlayer(socket.id, data);
     });
     socket.on("update", async data => {
-      if (this.game.players[socket.id]) {
-        this.game.syncPlayer(socket.id, data);
+      // TODO validate data
+      const player = this.game.players.get(socket.id);
+      if (player) {
+        player.lastMessage = data.messageId;
+        player.speed.assign(data.speed);
+        player.shoot = data.shoot;
+        player.shootDirection.assign(data.shootDirection);
       }
     });
   };
@@ -50,7 +61,8 @@ export class Controller {
       this.game.update();
       this.io.emit("sync", {
         remainingTime: this.getRemainingTime(),
-        ...this.game.getState()
+        players: mapToRecord(this.game.players),
+        shots: this.game.shots
       });
     }, 1000 / 60);
   }

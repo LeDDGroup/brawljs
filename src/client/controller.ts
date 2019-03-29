@@ -1,5 +1,5 @@
 import { Player } from "./utils/player";
-import { Game } from "./game";
+import { Game, Shot } from "../core/game";
 import { Queue } from "./utils/queue";
 import {
   MessageHandlerDispatcher,
@@ -7,7 +7,7 @@ import {
   ClientMessages,
   ServerMessages
 } from "../core/messages";
-import { Map, Block } from "../core/map";
+import { GameMap, Block } from "../core/map";
 
 type Func<Args extends any[] = [], Ret = void> = (...args: Args) => Ret;
 
@@ -35,7 +35,7 @@ export class Controller {
   remainingTime: number = 0;
   interval: number = 0;
   public get player() {
-    return this.game.players[this.id];
+    return this.game.getPlayer(this.id);
   }
   constructor(
     // TODO use option object instead
@@ -45,7 +45,7 @@ export class Controller {
     public canvas: HTMLCanvasElement,
     terrain: Block[][]
   ) {
-    this.game = new Game(new Map(terrain));
+    this.game = new Game(new GameMap(terrain));
   }
   async setup() {
     this.playerInput.setup();
@@ -56,7 +56,24 @@ export class Controller {
   }
   onSync(data: ServerMessages["sync"]) {
     this.remainingTime = data.remainingTime;
-    this.game.sync(data);
+    for (const id in this.game.players) {
+      if (data.players[id] === undefined) {
+        this.game.players.delete(id);
+      }
+    }
+    for (const id in data.players) {
+      const newData = data.players[id];
+      if (!this.game.players.has(id)) {
+        this.game.addPlayer(newData.id, {
+          color: newData.color,
+          name: newData.name
+        });
+      }
+      this.game.setPlayer(id, newData);
+    }
+    this.game.shots = data.shots.map(
+      shot => new Shot(shot.position, shot.speed, shot.playerId)
+    );
     if (data.players[this.id]) {
       if (!this.messages.empty()) {
         const lastMessage = data.players[this.id].lastMessage;
@@ -68,7 +85,8 @@ export class Controller {
             this.messages.drop();
           }
         this.messages.forEach(message => {
-          this.game.syncPlayer(this.id, message);
+          this.player.speed.assign(message.speed);
+          this.player.lastMessage = message.messageId;
           this.game.update();
           return true;
         });
@@ -76,13 +94,11 @@ export class Controller {
     }
     if (this.remainingTime <= 0) {
       this.stop();
-      this.onEnd(
-        Object.keys(this.game.players).map(id => ({
-          id,
-          name: this.game.players[id].name,
-          score: this.game.players[id].score
-        }))
+      const gameResult: { id: string; name: string; score: number }[] = [];
+      this.game.players.forEach(({ score, name }, id) =>
+        gameResult.push({ id, name, score })
       );
+      this.onEnd(gameResult);
     }
   }
   start() {
@@ -115,7 +131,8 @@ export class Controller {
     };
     this.socket.emit("update", update);
     this.messages.push(baseUpdate);
-    this.game.syncPlayer(this.id, baseUpdate);
+    this.player.lastMessage = update.messageId;
+    this.player.speed.assign(update.speed);
 
     this.game.update();
     this.playerInput.resetInput();
@@ -173,9 +190,8 @@ export class Controller {
   }
   drawPlayers() {
     this.context.save();
-    for (const id in this.game.players) {
-      const player = this.game.players[id];
-      if (player.life <= 0) continue;
+    this.game.players.forEach(player => {
+      if (player.life <= 0) return;
       this.context.fillStyle = player.color;
       this.context.beginPath();
       this.context.arc(
@@ -195,7 +211,7 @@ export class Controller {
         player.position.x * BLOCK_SIZE,
         (player.position.y - player.radius) * BLOCK_SIZE
       );
-    }
+    });
     this.context.restore();
   }
   drawShots() {

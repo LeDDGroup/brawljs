@@ -1,6 +1,9 @@
-import { IPoint } from "./point";
-import { Player, Shot } from "./game-base";
+import { Data } from "./types";
+import { Point } from "./point";
+import { Player, Shot } from "./game";
 import { Block } from "./map";
+
+type IPoint = Data<Point>;
 
 export interface ClientMessages {
   newPlayer: { name: string; color: string };

@@ -6,7 +6,7 @@ import IO, { Server as SocketServer } from "socket.io";
 import { Controller } from "./controller";
 import bodyParser from "koa-bodyparser";
 import route from "koa-route";
-import { Block, Map, getTerrainFromString } from "../core/map";
+import { Block, GameMap, getTerrainFromString } from "../core/map";
 
 class Server {
   app: Koa;
@@ -23,7 +23,7 @@ class Server {
   createGame(name: string, terrain: Block[][]) {
     const controller = new Controller(
       this.io.of((++this.gameCounter).toString()),
-      new Map(terrain)
+      new GameMap(terrain)
     );
     this.games[controller.id] = { controller, name };
     controller.onEnd = () => {

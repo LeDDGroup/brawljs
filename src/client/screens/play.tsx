@@ -17,14 +17,11 @@ export async function play(info: {
   gameId: string;
 }) {
   const container = document.getElementById("app");
-  const canvasRef: JSX.Reference<"canvas"> = {};
+  const canvas: HTMLCanvasElement = <canvas /> as HTMLCanvasElement;
 
-  render(container, <canvas ref={canvasRef} />);
+  render(container, canvas);
 
-  if (canvasRef.value === undefined) {
-    throw new Error("Couldn't get canvas reference");
-  }
-  const context = canvasRef.value.getContext("2d");
+  const context = canvas.getContext("2d");
   if (context === null) {
     throw new Error("Context is not supported");
   }
@@ -38,16 +35,10 @@ export async function play(info: {
   await onConnect.promise;
   const id = socket.id;
   const { terrain } = await onMap.promise;
-  canvasRef.value.width = CANVAS_SIZE.x;
-  canvasRef.value.height = CANVAS_SIZE.y;
+  canvas.width = CANVAS_SIZE.x;
+  canvas.height = CANVAS_SIZE.y;
   const onEnd = defer<any>(); // TODO don't use any
-  const controller = new Controller(
-    context,
-    socket,
-    info,
-    canvasRef.value,
-    terrain
-  );
+  const controller = new Controller(context, socket, info, canvas, terrain);
   controller.setup();
   controller.start();
   controller.onEnd = onEnd.resolve;

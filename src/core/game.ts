@@ -1,7 +1,7 @@
-import { Point, IPoint } from "./point";
-import { ClientMessages } from "./messages";
+import { Point } from "./point";
 import { Circle, Rect } from "./shape";
-import { Map, Block } from "./map";
+import { GameMap, Block } from "./map";
+import { Data } from "./types";
 
 const START_LIFE = 100;
 const SHOOT_COOLDOWN = 60;
@@ -13,20 +13,17 @@ const DEAD_COOLDOWN = 180;
 const SHOT_DAMAGE = 50;
 
 export class Player extends Circle {
+  id: string = "";
   score = 0;
-  life: number = START_LIFE;
+  life: number = 0;
   lastMessage = "";
   name: string = "";
   color: string = "";
   speed: Point = new Point();
+  shoot: boolean = false;
+  shootDirection: Point = new Point();
   shootCooldown: number = 0;
   deadCooldown: number = 0;
-  constructor(public id: string) {
-    super(PLAYER_SIZE);
-  }
-  sync(status: { speed: IPoint }) {
-    this.speed.assign(status.speed).top(PLAYER_SPEED);
-  }
 }
 
 export class Shot extends Circle {
@@ -34,7 +31,7 @@ export class Shot extends Circle {
   life = 30;
   position: Point;
   speed: Point;
-  constructor(position: IPoint, speed: IPoint, playerId: string) {
+  constructor(position: Point, speed: Point, playerId: string) {
     super(SHOT_SIZE);
     this.playerId = playerId;
     this.position = new Point(position);
@@ -48,17 +45,58 @@ export class Shot extends Circle {
   }
 }
 
-export class GameBase {
-  players: Record<keyof any, Player> = {};
+export class Game {
+  players = new Map<string, Player>();
   shots: Shot[] = [];
-  constructor(public map: Map) {}
+  constructor(public map: GameMap) {}
+  getPlayer(id: string): Player {
+    const player = this.players.get(id);
+    if (player === undefined) {
+      throw new Error("Player doesn't exist");
+    }
+    return player;
+  }
+  addPlayer(id: string, options: { color: string; name: string }) {
+    const player = new Player();
+    player.id = id;
+    player.life = START_LIFE;
+    player.color = options.color;
+    player.name = options.name;
+    player.radius = PLAYER_SIZE;
+    this.players.set(id, player);
+    this.resetPlayerPosition(id);
+  }
+  addShot(player: Player) {
+    const speed = new Point(player.shootDirection).top(SHOT_SPEED);
+    this.shots.push(new Shot(player.position, speed, player.id));
+  }
+  setPlayer(
+    id: string,
+    options: {
+      position: Data<Point>;
+      life: number;
+      score: number;
+      deadCooldown: number;
+    }
+  ) {
+    const player = this.getPlayer(id);
+    player.position.assign(options.position);
+    player.life = options.life;
+    player.score = options.score;
+    player.deadCooldown = options.deadCooldown;
+  }
+  removePlayer(id: string) {
+    this.players.delete(id);
+  }
+  resetPlayerPosition(id: string) {
+    this.players.get(id)!.position.assign(this.getRandomPlayerPosition());
+  }
   update() {
     this.updatePlayers();
     this.updateShots();
   }
   updatePlayers() {
-    for (const id in this.players) {
-      const player = this.players[id];
+    this.players.forEach(player => {
       if (player.shootCooldown > 0) {
         player.shootCooldown--;
       }
@@ -71,16 +109,22 @@ export class GameBase {
       }
       if (player.life > 0) {
         player.position.sum(
-          this.getSpeedAfterCollision(player.toRect(), player.speed)
+          this.getSpeedAfterCollision(
+            player.toRect(),
+            player.speed.top(PLAYER_SPEED)
+          )
         );
+        if (player.shoot && player.shootCooldown <= 0) {
+          player.shootCooldown = SHOOT_COOLDOWN;
+          this.addShot(player);
+        }
       }
-    }
+    });
   }
   updateShots() {
     for (let i = 0; i < this.shots.length; i++) {
       const shot = this.shots[i];
-      for (const key in this.players) {
-        const player = this.players[key];
+      this.players.forEach(player => {
         if (
           player.life > 0 &&
           shot.playerId !== player.id &&
@@ -90,10 +134,10 @@ export class GameBase {
           shot.life = 0;
           if (player.life <= 0) {
             player.deadCooldown = DEAD_COOLDOWN;
-            this.players[shot.playerId].score++;
+            this.players.get(shot.playerId)!.score++;
           }
         }
-      }
+      });
       const nextPosition = shot.toRect();
       nextPosition.position.sum(shot.speed);
       if (this.checkCollision(nextPosition)) shot.life = 0;
@@ -101,13 +145,13 @@ export class GameBase {
       if (shot.life <= 0) this.shots.splice(i, 1);
     }
   }
-  getSpeedAfterCollision(rect: Rect, speed: Point): IPoint {
+  getSpeedAfterCollision(rect: Rect, speed: Point): Point {
     if (!this.checkCollision(rect.rectCopy().move(speed))) return speed;
     if (!this.checkCollision(rect.rectCopy().move(new Point({ y: speed.y }))))
       return new Point({ y: speed.y }).top(speed.getLength());
     if (!this.checkCollision(rect.rectCopy().move(new Point({ x: speed.x }))))
       return new Point({ x: speed.x }).top(speed.getLength());
-    return { x: 0, y: 0 };
+    return new Point();
   }
   checkCollision(rect: Rect): boolean {
     const starty = Math.floor(rect.position.y);
@@ -123,18 +167,7 @@ export class GameBase {
     }
     return false;
   }
-  syncPlayer(id: string, data: ClientMessages["update"]) {
-    const player = this.players[id];
-    player.lastMessage = data.messageId;
-    if (player.life <= 0) return;
-    player.sync(data);
-    if (data.shoot && player.shootCooldown <= 0) {
-      player.shootCooldown = SHOOT_COOLDOWN;
-      const speed = new Point(data.shootDirection).top(SHOT_SPEED);
-      this.shots.push(new Shot(player.position, speed, player.id));
-    }
-  }
-  getRandomPlayerPosition(): IPoint {
+  getRandomPlayerPosition(): Point {
     return new Point(getRandom(this.map.playerPositions)).sum(0.5);
   }
 }

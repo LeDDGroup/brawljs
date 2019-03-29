@@ -6,7 +6,7 @@ export enum Block {
   Player
 }
 
-export class Map {
+export class GameMap {
   terrain: Block[][];
   size: IPoint;
   playerPositions: IPoint[];
