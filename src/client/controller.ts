@@ -172,7 +172,14 @@ export class Controller {
   }
   draw() {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.fillStyle = "#EDDBA1";
     this.withTransform([transform.scale, transform.translate], () => {
+      this.context.fillRect(
+        0,
+        0,
+        this.game.map.size.x * BLOCK_SIZE,
+        this.game.map.size.y * BLOCK_SIZE
+      );
       this.drawMap();
       this.drawPlayers();
       this.drawBullets();
@@ -187,7 +194,7 @@ export class Controller {
       for (let x = 0; x < this.game.map.size.x; x++) {
         const block = this.game.map.terrain[y][x];
         if (block === Block.Full || block === Block.Cover) {
-          this.context.fillStyle = block === Block.Full ? "#000000" : "#E4DC4C";
+          this.context.fillStyle = block === Block.Full ? "#DAA44D" : "#E4DC4C";
           this.context.fillRect(
             x * BLOCK_SIZE,
             y * BLOCK_SIZE,
