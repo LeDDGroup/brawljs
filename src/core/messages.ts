@@ -1,6 +1,6 @@
 import { Data } from "./types";
 import { Point } from "./point";
-import { Player, Shot } from "./game";
+import { Player, Bullet } from "./game";
 import { Block } from "./map";
 
 type IPoint = Data<Point>;
@@ -10,8 +10,8 @@ export interface ClientMessages {
   update: {
     messageId: string;
     speed: IPoint;
-    shoot: boolean;
-    shootDirection: IPoint;
+    attack: boolean;
+    attackDirection: IPoint;
   };
 }
 
@@ -22,7 +22,7 @@ export interface ServerMessages {
   sync: {
     remainingTime: number;
     players: Record<any, Player>;
-    shots: Shot[];
+    bullets: Bullet[];
   };
 }
 

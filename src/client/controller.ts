@@ -1,5 +1,5 @@
 import { Player } from "./utils/player";
-import { Game, Shot } from "../core/game";
+import { Game } from "../core/game";
 import { Queue } from "./utils/queue";
 import {
   MessageHandlerDispatcher,
@@ -72,8 +72,14 @@ export class Controller {
       }
       this.game.setPlayer(id, newData);
     }
-    this.game.shots = data.shots.map(
-      shot => new Shot(shot.position, shot.speed, shot.playerId)
+    this.game.bullets = [];
+    data.bullets.forEach(({ playerId, life, radius, speed, position }) =>
+      this.game.addBullet(playerId, {
+        time: life,
+        size: radius,
+        speed,
+        position
+      })
     );
     if (data.players[this.id]) {
       if (!this.messages.empty()) {
@@ -121,14 +127,14 @@ export class Controller {
     const baseUpdate: ClientMessages["update"] = {
       messageId: Date.now().toString(),
       speed: this.playerInput.moving(),
-      shoot: false,
-      shootDirection: { x: 0, y: 0 }
+      attack: false,
+      attackDirection: { x: 0, y: 0 }
     };
 
     const update = {
       ...baseUpdate,
-      shoot: this.playerInput.shooting,
-      shootDirection: this.playerInput.pointing
+      attack: this.playerInput.attacking,
+      attackDirection: this.playerInput.pointing
     };
     this.socket.emit("update", update);
     this.messages.push(baseUpdate);
@@ -168,7 +174,7 @@ export class Controller {
     this.withTransform([transform.scale, transform.translate], () => {
       this.drawMap();
       this.drawPlayers();
-      this.drawShots();
+      this.drawBullets();
     });
     this.drawRespawnCooldown();
     this.drawTimer();
@@ -215,15 +221,15 @@ export class Controller {
     });
     this.context.restore();
   }
-  drawShots() {
-    for (const shot of this.game.shots) {
+  drawBullets() {
+    for (const bullet of this.game.bullets) {
       this.context.save();
       this.context.fillStyle = "blue";
       this.context.beginPath();
       this.context.arc(
-        shot.position.x * BLOCK_SIZE,
-        shot.position.y * BLOCK_SIZE,
-        shot.radius * BLOCK_SIZE,
+        bullet.position.x * BLOCK_SIZE,
+        bullet.position.y * BLOCK_SIZE,
+        bullet.radius * BLOCK_SIZE,
         0,
         2 * Math.PI
       );

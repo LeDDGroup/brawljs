@@ -46,8 +46,8 @@ export class Controller {
       if (player) {
         player.lastMessage = data.messageId;
         player.speed.assign(data.speed);
-        player.shoot = data.shoot;
-        player.shootDirection.assign(data.shootDirection);
+        player.attack = data.attack;
+        player.attackDirection.assign(data.attackDirection);
       }
     });
   };
@@ -62,7 +62,7 @@ export class Controller {
       this.io.emit("sync", {
         remainingTime: this.getRemainingTime(),
         players: mapToRecord(this.game.players),
-        shots: this.game.shots
+        bullets: this.game.bullets
       });
     }, 1000 / 60);
   }

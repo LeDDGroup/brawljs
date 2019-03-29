@@ -4,7 +4,7 @@ type Direction = "right" | "down" | "left" | "up";
 
 export class Player {
   public keyboardStatus: { [id: string]: boolean } = {};
-  public shooting = false;
+  public attacking = false;
   public keybindings: Record<Direction, string>;
   public canvas: HTMLCanvasElement;
   public pointing = new Point();
@@ -48,11 +48,11 @@ export class Player {
           x: document.documentElement.clientWidth / 2,
           y: document.documentElement.clientHeight / 2
         });
-      this.shooting = true;
+      this.attacking = true;
     });
   }
   resetInput() {
-    this.shooting = false;
+    this.attacking = false;
   }
 }
 

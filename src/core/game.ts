@@ -4,27 +4,21 @@ import { GameMap, Block } from "./map";
 import { Data } from "./types";
 
 const PLAYER_SIZE = 0.3;
-const SHOT_SIZE = 0.15;
-const SHOT_SPEED = 0.1;
 const DEAD_COOLDOWN = 180;
 
 export enum PlayerType {
   sharpshooter = "sharpshooter"
 }
 
-interface Character {
-  hp: number;
-  speed: number;
-  cooldown: number;
-  damage: number;
-}
-
-const CharacterData: Record<PlayerType, Character> = {
+const CHARACTER_DATA = {
   sharpshooter: {
     hp: 100,
     speed: 0.03,
-    cooldown: 180,
-    damage: 50
+    cooldown: 60,
+    damage: 50,
+    bulletSize: 0.15,
+    bulletSpeed: 0.1,
+    bulletTime: 15
   }
 };
 
@@ -37,47 +31,30 @@ export class Player extends Circle {
   name: string = "";
   color: string = "";
   speed: Point = new Point();
-  shoot: boolean = false;
-  shootDirection: Point = new Point();
-  shootCooldown: number = 0;
+  attack: boolean = false;
+  attackDirection: Point = new Point();
+  attackCooldown: number = 0;
   deadCooldown: number = 0;
   // helpers
-  get maxHp() {
-    return CharacterData[this.type].hp;
-  }
-  get maxSpeed() {
-    return CharacterData[this.type].speed;
-  }
-  get damage() {
-    return CharacterData[this.type].damage;
-  }
-  get attackCooldown() {
-    return CharacterData[this.type].cooldown;
+  get base() {
+    return CHARACTER_DATA[this.type];
   }
 }
 
-export class Shot extends Circle {
+export class Bullet extends Circle {
   playerId: string;
-  life = 30;
-  position: Point;
-  speed: Point;
-  constructor(position: Data<Point>, speed: Data<Point>, playerId: string) {
-    super(SHOT_SIZE);
+  life = 0;
+  position: Point = new Point();
+  speed: Point = new Point();
+  constructor(playerId: string) {
+    super();
     this.playerId = playerId;
-    this.position = new Point(position);
-    this.speed = new Point(speed);
-  }
-  update() {
-    if (this.life > 0) {
-      this.position.sum(this.speed);
-      this.life--;
-    }
   }
 }
 
 export class Game {
   players = new Map<string, Player>();
-  shots: Shot[] = [];
+  bullets: Bullet[] = [];
   constructor(public map: GameMap) {}
   getPlayer(id: string): Player {
     const player = this.players.get(id);
@@ -99,12 +76,21 @@ export class Game {
     this.players.set(id, player);
     this.resetPlayer(id);
   }
-  addShot(
+  addBullet(
     playerId: string,
-    options: { direction: Data<Point>; position: Data<Point> }
+    options: {
+      time: number;
+      size: number;
+      speed: Data<Point>;
+      position: Data<Point>;
+    }
   ) {
-    const speed = new Point(options.direction).top(SHOT_SPEED);
-    this.shots.push(new Shot(options.position, speed, playerId));
+    const bullet = new Bullet(playerId);
+    bullet.position.assign(options.position);
+    bullet.speed.assign(options.speed);
+    bullet.radius = options.size;
+    bullet.life = options.time;
+    this.bullets.push(bullet);
   }
   setPlayer(
     id: string,
@@ -126,17 +112,17 @@ export class Game {
   }
   resetPlayer(id: string) {
     const player = this.getPlayer(id);
-    player.life = player.maxHp;
+    player.life = player.base.hp;
     player.position.assign(this.getRandomPlayerPosition());
   }
   update() {
     this.updatePlayers();
-    this.updateShots();
+    this.updateBullets();
   }
   updatePlayers() {
     this.players.forEach(player => {
-      if (player.shootCooldown > 0) {
-        player.shootCooldown--;
+      if (player.attackCooldown > 0) {
+        player.attackCooldown--;
       }
       if (player.deadCooldown > 0) {
         player.deadCooldown--;
@@ -148,16 +134,18 @@ export class Game {
         player.position.sum(
           this.getSpeedAfterCollision(
             player.toRect(),
-            player.speed.top(player.maxSpeed)
+            player.speed.top(player.base.speed)
           )
         );
-        if (player.shoot && player.shootCooldown <= 0) {
-          player.shootCooldown = player.attackCooldown;
+        if (player.attack && player.attackCooldown <= 0) {
+          player.attackCooldown = player.base.cooldown;
           switch (player.type) {
             case PlayerType.sharpshooter:
-              this.addShot(player.id, {
+              this.addBullet(player.id, {
+                time: player.base.bulletTime,
+                size: player.base.bulletSize,
                 position: player.position,
-                direction: player.shootDirection
+                speed: player.attackDirection.top(player.base.bulletSpeed)
               });
               break;
             default:
@@ -168,28 +156,31 @@ export class Game {
       }
     });
   }
-  updateShots() {
-    for (let i = 0; i < this.shots.length; i++) {
-      const shot = this.shots[i];
+  updateBullets() {
+    for (let i = 0; i < this.bullets.length; i++) {
+      const bullet = this.bullets[i];
       this.players.forEach(player => {
         if (
           player.life > 0 &&
-          shot.playerId !== player.id &&
-          player.collides(shot)
+          bullet.playerId !== player.id &&
+          player.collides(bullet)
         ) {
-          player.life -= this.getPlayer(shot.playerId).damage;
-          shot.life = 0;
+          player.life -= this.getPlayer(bullet.playerId).base.damage;
+          bullet.life = 0;
           if (player.life <= 0) {
             player.deadCooldown = DEAD_COOLDOWN;
-            this.players.get(shot.playerId)!.score++;
+            this.players.get(bullet.playerId)!.score++;
           }
         }
       });
-      const nextPosition = shot.toRect();
-      nextPosition.position.sum(shot.speed);
-      if (this.checkCollision(nextPosition)) shot.life = 0;
-      if (shot.life) shot.update();
-      if (shot.life <= 0) this.shots.splice(i, 1);
+      const nextPosition = bullet.toRect();
+      nextPosition.position.sum(bullet.speed);
+      if (this.checkCollision(nextPosition)) bullet.life = 0;
+      if (bullet.life > 0) {
+        bullet.position.sum(bullet.speed);
+        bullet.life--;
+      }
+      if (bullet.life <= 0) this.bullets.splice(i, 1);
     }
   }
   getSpeedAfterCollision(rect: Rect, speed: Point): Point {
