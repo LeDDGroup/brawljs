@@ -8,12 +8,7 @@ export class Circle {
   }
   collides(other: Circle): boolean {
     return (
-      other.radius + this.radius >
-      this.position
-        .copy()
-        .subtract(other.position)
-        .abs()
-        .getLength()
+      other.radius + this.radius > this.position.distanceTo(other.position)
     );
   }
   toRect(): Rect {

@@ -8,10 +8,12 @@ import {
   ServerMessages
 } from "../core/messages";
 import { GameMap, Block } from "../core/map";
+import * as colorString from "color-string";
 
 type Func<Args extends any[] = [], Ret = void> = (...args: Args) => Ret;
 
 export const BLOCK_SIZE = 48;
+const DISTANCE_TO_UNCOVER = 1;
 
 function Enum<T extends keyof any>(): { [id in T]: id } {
   return new Proxy<any>({} as T, {
@@ -215,8 +217,13 @@ export class Controller {
         this.game.map.blockAt(player.position.copy().floor()) === Block.Cover &&
         player.attackCooldown === 0
       )
-        return;
-      this.context.fillStyle = player.color;
+        if (
+          player.id === this.id ||
+          player.position.distanceTo(this.player.position) < DISTANCE_TO_UNCOVER
+        )
+          this.context.fillStyle = applyAlpha(player.color, 0.5);
+        else return;
+      else this.context.fillStyle = player.color;
       this.context.beginPath();
       this.context.arc(
         player.position.x * BLOCK_SIZE,
@@ -306,4 +313,13 @@ export class Controller {
 interface ExtendedSocket extends SocketIOClient.Socket {
   on: MessageHandlerDispatcher<ServerMessages>;
   emit: MessageDispatcher<ClientMessages>;
+}
+
+function applyAlpha(color: string, alpha: number): string {
+  const parsed = colorString.get(color);
+  if (!parsed) {
+    throw new Error("Color not defined or invalid");
+  }
+  const [r, g, b] = parsed.value;
+  return colorString.to.rgb(r, g, b, alpha);
 }

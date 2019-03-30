@@ -1,9 +1,12 @@
-import { Data } from "./types";
+interface IPoint {
+  x: number;
+  y: number;
+}
 
 export class Point {
   public x: number;
   public y: number;
-  constructor(options: Partial<Data<Point>> = {}) {
+  constructor(options: Partial<IPoint> = {}) {
     const { x = 0, y = 0 } = options;
     this.x = x;
     this.y = y;
@@ -26,7 +29,7 @@ export class Point {
     this.y = Math.ceil(this.y);
     return this;
   }
-  public sum(point: Partial<Data<Point>> | number): Point {
+  public sum(point: Partial<IPoint> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -34,7 +37,7 @@ export class Point {
     this.y += point.y || 0;
     return this;
   }
-  public subtract(point: Partial<Data<Point>> | number): Point {
+  public subtract(point: Partial<IPoint> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -42,7 +45,7 @@ export class Point {
     this.y -= point.y || 0;
     return this;
   }
-  public multiply(point: Partial<Data<Point>> | number): Point {
+  public multiply(point: Partial<IPoint> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -50,7 +53,7 @@ export class Point {
     this.y *= point.y !== undefined ? point.y : 1;
     return this;
   }
-  public divide(point: Partial<Data<Point>> | number): Point {
+  public divide(point: Partial<IPoint> | number): Point {
     if (typeof point === "number") {
       point = { x: point, y: point };
     }
@@ -62,7 +65,7 @@ export class Point {
     this.multiply(-1);
     return this;
   }
-  public assign(point: Partial<Data<Point>>): Point {
+  public assign(point: Partial<IPoint>): Point {
     this.x = point.x !== undefined ? point.x : this.x;
     this.y = point.y !== undefined ? point.y : this.y;
     return this;
@@ -85,6 +88,12 @@ export class Point {
     this.x = Math.abs(this.x);
     this.y = Math.abs(this.y);
     return this;
+  }
+  public distanceTo(other: IPoint) {
+    return this.copy()
+      .subtract(other)
+      .abs()
+      .getLength();
   }
 }
 
