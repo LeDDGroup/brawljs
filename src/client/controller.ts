@@ -13,7 +13,7 @@ import * as colorString from "color-string";
 type Func<Args extends any[] = [], Ret = void> = (...args: Args) => Ret;
 
 export const BLOCK_SIZE = 48;
-const DISTANCE_TO_UNCOVER = 1;
+const DISTANCE_TO_UNCOVER = 1.5;
 
 function Enum<T extends keyof any>(): { [id in T]: id } {
   return new Proxy<any>({} as T, {
@@ -196,7 +196,13 @@ export class Controller {
       for (let x = 0; x < this.game.map.size.x; x++) {
         const block = this.game.map.terrain[y][x];
         if (block === Block.Full || block === Block.Cover) {
-          this.context.fillStyle = block === Block.Full ? "#DAA44D" : "#E4DC4C";
+          this.context.fillStyle =
+            block === Block.Full
+              ? "#DAA44D"
+              : this.player.position.distanceTo({ x: x + 0.5, y: y + 0.5 }) <
+                DISTANCE_TO_UNCOVER
+              ? applyAlpha("#E4DC4C", 0.5)
+              : "#E4DC4C";
           this.context.fillRect(
             x * BLOCK_SIZE,
             y * BLOCK_SIZE,
