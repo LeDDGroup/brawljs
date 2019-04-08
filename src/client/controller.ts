@@ -1,4 +1,4 @@
-import { Player } from "./utils/player";
+import { PlayerInput } from "./utils/player-input";
 import { Game, PlayerType } from "../core/game";
 import { Queue } from "./utils/queue";
 import {
@@ -16,7 +16,7 @@ const DISTANCE_TO_UNCOVER = 1.5;
 export class Controller {
   game: Game;
   messages = new Queue<ClientMessages["update"]>();
-  playerInput = new Player({
+  playerInput = new PlayerInput({
     keybindings: { left: "a", right: "d", up: "w", down: "s" },
     canvas: this.canvas
   });

@@ -1,8 +1,8 @@
-import { IPoint, Point } from "../../core/point";
+import { Point } from "../../core/point";
 
 type Direction = "right" | "down" | "left" | "up";
 
-export class Player {
+export class PlayerInput {
   public keyboardStatus: { [id: string]: boolean } = {};
   public attacking = false;
   public keybindings: Record<Direction, string>;
@@ -15,15 +15,15 @@ export class Player {
     this.keybindings = options.keybindings;
     this.canvas = options.canvas;
   }
-  moving(): IPoint {
-    return {
+  moving() {
+    return new Point({
       x:
         bto1(this.keyboardStatus[this.keybindings.right]) -
         bto1(this.keyboardStatus[this.keybindings.left]),
       y:
         bto1(this.keyboardStatus[this.keybindings.down]) -
         bto1(this.keyboardStatus[this.keybindings.up])
-    };
+    });
   }
   setup() {
     document.addEventListener("keydown", ev => {
