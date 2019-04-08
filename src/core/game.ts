@@ -3,10 +3,11 @@ import { Circle, Rect } from "./shape";
 import { GameMap, Block } from "./map";
 import { Data } from "./types";
 
+const SEC = 60; // 1 second = 60 frames
 const PLAYER_SIZE = 0.3;
-const DEAD_COOLDOWN = 180;
+const DEAD_COOLDOWN = 3 * SEC;
 const DEGREE_RAD_REL = Math.PI / 180;
-const COVER_COOLDOWN = 30;
+const COVER_COOLDOWN = 1 * SEC;
 
 export enum PlayerType {
   mele = "mele",
@@ -16,8 +17,8 @@ export enum PlayerType {
 const CHARACTER_DATA = {
   mele: {
     hp: 150,
-    speed: 0.04,
-    cooldown: 60,
+    speed: 2 / SEC,
+    cooldown: 1 * SEC,
     damage: 20,
     bulletSize: 0.05,
     bulletSpeed: 0.1,
@@ -27,8 +28,8 @@ const CHARACTER_DATA = {
   },
   sharpshooter: {
     hp: 100,
-    speed: 0.03,
-    cooldown: 60,
+    speed: 1.8 / SEC,
+    cooldown: 1 * SEC,
     damage: 50,
     bulletSize: 0.15,
     bulletSpeed: 0.1,

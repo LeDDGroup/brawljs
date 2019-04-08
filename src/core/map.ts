@@ -40,7 +40,7 @@ export function getTerrainFromString(map: string) {
       row
         .split("")
         .map(block =>
-          block === "0"
+          block === "0" || block === " "
             ? Block.Empty
             : block === "p"
             ? Block.Player
