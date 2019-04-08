@@ -21,7 +21,7 @@ const CHARACTER_DATA = {
     damage: 20,
     bulletSize: 0.05,
     bulletSpeed: 0.1,
-    bulletTime: 15,
+    bulletTime: 3 / 0.1, // 3 blocks at 0.1 blocks per frame
     attackRange: 40 * DEGREE_RAD_REL,
     bulletAmount: 8
   },
@@ -32,7 +32,7 @@ const CHARACTER_DATA = {
     damage: 50,
     bulletSize: 0.15,
     bulletSpeed: 0.1,
-    bulletTime: 30
+    bulletTime: 6 / 0.1 // 6 blocks at 0.1 blocks per frame
   }
 };
 
