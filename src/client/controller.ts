@@ -219,9 +219,8 @@ export class Controller {
     this.game.players.forEach(player => {
       if (player.life <= 0) return;
       if (
-        // If is under cover and hasn't attack long ago hide it
         this.game.map.blockAt(player.position.copy().floor()) === Block.Cover &&
-        player.attackCooldown === 0
+        player.coverCooldown === 0
       )
         if (
           player.id === this.id ||

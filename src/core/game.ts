@@ -5,6 +5,8 @@ import { Data } from "./types";
 
 const PLAYER_SIZE = 0.3;
 const DEAD_COOLDOWN = 180;
+const DEGREE_RAD_REL = Math.PI / 180;
+const COVER_COOLDOWN = 30;
 
 export enum PlayerType {
   mele = "mele",
@@ -20,7 +22,7 @@ const CHARACTER_DATA = {
     bulletSize: 0.05,
     bulletSpeed: 0.1,
     bulletTime: 15,
-    attackRange: (Math.PI * 40) / 180,
+    attackRange: 40 * DEGREE_RAD_REL,
     bulletAmount: 8
   },
   sharpshooter: {
@@ -47,6 +49,7 @@ export class Player extends Circle {
   attackDirection: Point = new Point();
   attackCooldown: number = 0;
   deadCooldown: number = 0;
+  coverCooldown: number = 0;
   // helpers
   get base() {
     return CHARACTER_DATA[this.type];
@@ -141,6 +144,9 @@ export class Game {
       if (player.deadCooldown > 0) {
         player.deadCooldown--;
       }
+      if (player.coverCooldown > 0) {
+        player.coverCooldown--;
+      }
       if (player.life <= 0 && player.deadCooldown <= 0) {
         this.resetPlayer(player.id);
       }
@@ -152,6 +158,7 @@ export class Game {
           )
         );
         if (player.attack && player.attackCooldown <= 0) {
+          player.coverCooldown = COVER_COOLDOWN;
           player.attackCooldown = player.base.cooldown;
           switch (player.type) {
             case PlayerType.sharpshooter:
@@ -199,6 +206,7 @@ export class Game {
           bullet.playerId !== player.id &&
           player.collides(bullet)
         ) {
+          player.coverCooldown = COVER_COOLDOWN;
           player.life -= this.getPlayer(bullet.playerId).base.damage;
           bullet.life = 0;
           if (player.life <= 0) {
