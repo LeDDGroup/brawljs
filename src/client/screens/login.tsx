@@ -37,7 +37,7 @@ export async function login() {
       <option>sharpshooter</option>
     </select>
   ) as HTMLSelectElement;
-  const gameList = <ul /> as HTMLUListElement;
+  const gameList = <table /> as HTMLTableElement;
   render(
     container,
     <div className="container">
@@ -72,15 +72,17 @@ export async function login() {
     render(
       gameList,
       ...games.map(({ id, name, players }) => (
-        <li>
-          <div>
+        <tr>
+          <td>
             <span>{name}</span>
+          </td>
+          <td>
             <span>{players} player(s)</span>
-            <div>
-              <button onclick={() => onConnect.resolve(id)}>Connect</button>
-            </div>
-          </div>
-        </li>
+          </td>
+          <td>
+            <button onclick={() => onConnect.resolve(id)}>Connect</button>
+          </td>
+        </tr>
       ))
     );
   }
